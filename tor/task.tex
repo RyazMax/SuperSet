@@ -1,0 +1,258 @@
+
+\begin{titlepage}
+\singlespacing
+\thispagestyle{empty}
+
+\ifx\wauthor\undefined\providecommand{\wauthorspace}{\vspace{7pt}}\fi
+
+\providecommand{\wauthorspace}{}
+\providecommand{\wtype}
+{{\huge ЗАДАНИЕ}
+
+\bigskip
+
+{\LARGE
+на выполнение курсового проекта
+}
+
+\bigskip
+}
+\providecommand{\wauthor}{}
+\providecommand{\wgroup}{}
+\providecommand{\wfirstlead}{}
+\providecommand{\wleadprefix}{Руководитель курсового проекта}
+
+
+
+\begin{minipage}{\textwidth}
+\fontsize{10}{15}
+\centering
+\bfseries
+
+Министерство науки и высшего образования Российской
+Федерации\\
+
+Федеральное государственное бюджетное образовательное учреждение\\
+
+высшего образования\\
+
+<<Московский государственный технический университет
+имени Н.Э. Баумана\\
+
+(национальный исследовательский университет)>>\\
+
+(МГТУ им. Н.Э. Баумана)\\
+
+\end{minipage}
+
+{\vspace{5pt}
+\rule{\linewidth}{3pt}
+%\Xhline{3pt}
+
+\par
+\rule[20pt]{\linewidth}{1pt}
+%\Xhline{1pt}
+\vspace{-2em}
+}
+
+\begin{adjustbox}{minipage=0.4\textwidth,valign=T,right}
+        \footnotesize
+    \centering
+    УТВЕРЖДАЮ
+
+    \begin{adjustbox}{minipage=0.7\textwidth}
+        Заведующий кафедрой
+    \end{adjustbox}
+    \begin{adjustbox}{minipage=0.25\textwidth}
+        \uline{\hfillИУ7\hfill}
+    \end{adjustbox}\\
+    \begin{adjustbox}{minipage=0.25\textwidth, right}
+        \scriptsize
+        \vspace{-1em}
+        (индекс)
+    \end{adjustbox}\\
+    \begin{adjustbox}{minipage=0.4\textwidth}
+        \vspace{.7em}
+        \uline{\hfill}
+    \end{adjustbox}
+    \begin{adjustbox}{minipage=0.55\textwidth}
+        \uline{\hfill И.В. Рудаков\hfill}
+    \end{adjustbox}\\
+    \begin{adjustbox}{minipage=0.45\textwidth, right}
+        \scriptsize
+        \vspace{-0.6em}
+        (И.О.Фамилия)
+    \end{adjustbox}\\
+    \begin{adjustbox}{minipage=\textwidth, center}
+        <<\uline{\hfill}>>\uline{\hfill\hfill\hfill} 20\uline{\hfill} г.
+    \end{adjustbox}
+
+\end{adjustbox}
+
+\bigskip
+
+\begin{center}
+    \LARGE\textbf{ЗАДАНИЕ}
+
+    \large\textbf{на выполнение курсового проекта}
+    \small
+
+    по дисциплине
+    \uline{\hfill
+        Базы данных
+    \hfill}
+
+    Студент группы
+    \uline{\hfill
+        \wgroup
+    \hfill}
+
+    {\singlespacing
+    \uline{\hfill
+        Рязанов 
+        Максим 
+        Сергеевич
+    \hfill}
+
+    {\scriptsize\vspace{-0.3em}(Фамилия, имя, отчество)}
+    }
+
+    \vspace{1em}
+
+    Тема курсового проекта
+    \uline{\hfill Сервис для разметки данных \hfill}
+
+
+    {\flushleft
+    Направленность КП (учебный, исследовательский, практический,
+    производственный, др.) 
+    \hfill}
+
+    \uline{\hfill
+        практический
+    \hfill}
+
+    Источник тематики (кафедра, предприятие, НИР)
+    \uline{\hfill
+        кафедра
+    \hfill}
+
+    График выполнения проекта: 
+        25\% к \uline{\hfill4\hfill} нед.,
+        50\% к \uline{\hfill7\hfill} нед.,
+        75\% к \uline{\hfill11\hfill} нед.,
+        100\% к \uline{\hfill14\hfill} нед.
+
+    \textbf{Задание}
+    \uline{\hfill
+        Разработать веб-приложение, позволяющее загружать и размечать наборы данных разных
+        видов для последующего использования размеченных данных в задачах машинного обучения.
+    \hfill}
+
+    \uline{\hfill 
+        Должна быть предоставлена возможность выбирать тип размечаемых данных и тип проводимой разметки. 
+    \hfill}
+
+    \uline{\hfill
+        Cреди поддерживаемых типов входных данных должны быть: текст, изображения, табличные данные(с задаваемым количеством колонок).
+    \hfill}
+
+    \uline{\hfill
+        Среди поддерживаемых типов разметки должны быть: классификация(из заданных пользователем классов), численная метка(целое, вещественное), текст, прямоугольная область(для изображений).
+    \hfill}
+
+    {\flushleft
+    \textbf{Оформление курсового проекта:}
+    \hfill}
+
+    {\flushleft
+    Расчетно-пояснительная записка на 
+    \uline{\hspace{1em}15-20\hspace{1em}}
+    листах формата A4.
+    \hfill}
+
+    {\flushleft
+        Перечень графического (иллюстративного) материала
+        (чертежи, плакаты, слайды и т.п.)
+    \hfill}
+
+    \uline{\hfill
+        На защиту проекта должна быть предоставлена презентация,
+        состоящая из 15-20 слайдов.
+    \hfill}
+
+    \uline{\hfill
+        На слайдах должны быть отражены: постановка задачи,
+        схемы базы данных,
+    \hfill}
+
+    \uline{\hfill
+        схемы и описания компонент приложения, интерфейс.
+    \hfill}
+
+    \uline{\hfill\hfill}
+
+    {\flushleft
+        Дата выдачи задания <<\hspace{1.5em}>>
+        \uline{\hspace{4em}} 
+        20\uline{\hspace{1em}} г.
+    \hfill}
+
+\end{center}
+
+\begin{adjustbox}{minipage=0.35\textwidth,valign=T}
+    \begin{flushleft}
+        \footnotesize
+        \textbf{\wleadprefix}
+    \end{flushleft}
+        \vspace{0em}
+    \begin{flushleft}
+        \footnotesize
+        \textbf{Студент}
+    \end{flushleft}
+\end{adjustbox}
+\hfill
+\begin{adjustbox}{minipage=0.3\linewidth,valign=T}
+        \vspace{7pt}
+
+    \begin{center}
+        \footnotesize
+        \uline{\hfill}
+
+        \scriptsize
+        (Подпись, дата)
+    \end{center}
+    \begin{center}
+        \footnotesize
+        \uline{\hfill}
+
+        \scriptsize
+        (Подпись, дата)
+    \end{center}
+\end{adjustbox}
+\hfill
+\begin{adjustbox}{minipage=0.3\linewidth,valign=T}
+    \wauthorspace\begin{center}
+        \footnotesize
+        \uline{\hfill\wfirstlead\hfill}
+
+        \scriptsize
+        (И.О.Фамилия)
+    \end{center}
+    \begin{center}
+        \footnotesize
+        \uline{\hfill\wauthor\hfill}
+
+        \scriptsize
+        (И.О.Фамилия)
+    \end{center}
+\end{adjustbox}
+
+\vfill
+
+\begin{flushleft}
+\uline{Примечание}: Задание оформляется в двух экземплярах: один выдается
+студенту, второй хранится на кафедре.
+\end{flushleft}
+
+\end{titlepage}
