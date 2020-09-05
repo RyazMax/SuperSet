@@ -1,23 +1,16 @@
 package user
 
-const (
-	ADMIN_USER = iota
-	REGULAR_USER
-)
+import "../../models"
 
-type User struct {
-	ID             int
-	Login          string
-	passwordShadow string
-	Type           int
-}
-
-type UserRepo interface {
+// Repo interface to interruct with data
+type Repo interface {
 	Init(string, int) error
 
-	GetById(int) (User, error)
-	GetByLogin(string) (User, error)
+	GetByID(int) (*models.User, error)
+	GetByLogin(string) (*models.User, error)
 
-	SetById(int) (User, error)
-	SetByLogin(int) (User, error)
+	DeleteByID(int) error
+	DeleteByLogin(string) error
+
+	Insert(*models.User) error
 }
