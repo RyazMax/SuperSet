@@ -28,4 +28,29 @@ jobs:
         with:
           name: main.pdf.zip
           path: tor/main.pdf
+  test:
+    strategy:
+      matrix:
+        go-version: [1.14.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go-version }}
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Install Tarantool
+      run: sudo apt update && curl -L https://tarantool.io/installer.sh | VER=2.4 sudo -E bash
+    - name: Install Tarantool-ddl
+      run: tarantoolctl rocks install ddl
+    - name: Create data dir
+      run: mkdir src/tarantool/data
+    - name: Start Tarantool
+      run: tarantool src/tarantool/init.lua &!
+    - name: Install Tarantool module # Rewrite
+      run: go get github.com/tarantool/go-tarantool
+    - name: Test
+      run: go test ./...  
 
