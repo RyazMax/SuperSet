@@ -10,8 +10,8 @@ import (
 )
 
 func main() {
-	http.Handle("/api", api.Handler())
-	http.Handle("/static", static.Handler())
+	http.Handle("/api/", api.Handler())
+	http.Handle("/static/", http.StripPrefix("/static/", static.Handler()))
 	http.Handle("/", templates.Handler())
 
 	log.Println("Server starting on 127.0.0.1:9999")
