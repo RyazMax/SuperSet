@@ -3,6 +3,7 @@ local ddl = require('ddl')
 
 local user = require('src.tarantool.user')
 local project = require('src.tarantool.project')
+local session = require('src.tarantool.session')
 
 box.cfg{
     listen = config.listen_port,
@@ -12,6 +13,7 @@ box.cfg{
 local function init()
     ddl.set_schema(user.schema)
     ddl.set_schema(project.schema)
+    ddl.set_schema(session.schema)
 
     box.schema.user.create('go',  { password = 'go', if_not_exists = true })
     box.schema.user.grant('go', 'read,write', 'universe', nil, { if_not_exists = true })

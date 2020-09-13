@@ -1,0 +1,11 @@
+{{template "base" .}}
+
+{{define "title"}}Login{{end}}
+
+{{define "main"}}
+<form action="/login" method="POST">
+    <input name="Login">
+    <input name="Password" type="password">
+    <input type="submit">
+</form>
+{{end}}

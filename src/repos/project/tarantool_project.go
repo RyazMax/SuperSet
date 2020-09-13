@@ -21,6 +21,11 @@ func (tp *TarantoolRepo) Init(host string, port int) (err error) {
 	return err
 }
 
+// Drop closes connection
+func (tp *TarantoolRepo) Drop() {
+	tp.conn.Close()
+}
+
 // GetByID gets project by id
 func (tp *TarantoolRepo) GetByID(id int) (*models.Project, error) {
 	var p []models.Project

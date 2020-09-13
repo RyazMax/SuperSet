@@ -22,6 +22,11 @@ func (tp *TarantoolRepo) Init(host string, port int) (err error) {
 	return err
 }
 
+// Drop closes connection
+func (tp *TarantoolRepo) Drop() {
+	tp.conn.Close()
+}
+
 // GetByID gets User by id
 func (tp *TarantoolRepo) GetByID(id int) (*models.User, error) {
 	var u []models.User

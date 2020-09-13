@@ -7,9 +7,15 @@ import (
 	"../src/api"
 	"../src/static"
 	"../src/templates"
+	"../src/universe"
 )
 
 func main() {
+	err := universe.Init("127.0.0.1", 6666)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	http.Handle("/api/", api.Handler())
 	http.Handle("/static/", http.StripPrefix("/static/", static.Handler()))
 	http.Handle("/", templates.Handler())

@@ -73,7 +73,7 @@ func TestProjectRepos(t *testing.T) {
 			t.Errorf("DeleteByID on %T failed with %v", repo, err)
 		}
 
-		err = repo.DeleteByName(testProject.Name)
+		err = repo.DeleteByName(testProject2.Name)
 		if err != nil {
 			t.Errorf("DeleteByName on %T failed with %v", repo, err)
 		}

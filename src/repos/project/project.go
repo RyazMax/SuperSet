@@ -5,6 +5,7 @@ import "../../models"
 // Repo interface to interruct with data
 type Repo interface {
 	Init(string, int) error
+	Drop()
 
 	GetByID(int) (*models.Project, error)
 	GetByName(string) (*models.Project, error)
