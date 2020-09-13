@@ -65,7 +65,7 @@ func TestAuth(t *testing.T) {
 			t.Errorf("CheckSession after Logout failed on %T, expected nil", repo)
 		}
 
-		sess, err = repo.Login(testUser.Login, testUser.PasswordShadow)
+		sess, err = repo.Login(testUser.Login, "")
 		if err != nil {
 			t.Errorf("Login failed on %T, with error %v", repo, err)
 		}

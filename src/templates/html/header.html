@@ -1,7 +1,18 @@
 {{define "header"}}
-<footer>Powered by <a href='https://golang.org/'>Go</a></footer>
-
-<a href='/login'>Login</a>
-<a href='/new_user'>Signup</a>
-<a href='/logout'>Logout</a>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+    <img class="mr-4" src="/static/img/logo.png" alt="" width="64" height="64">
+    <a class="navbar-brand" href="/">Главная</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+    {{ if .UserName }}
+    <a class="nav-link" href="/profile">{{.UserName}}</a>
+    <a class="nav-link" href="/logout"> Выйти  </a>
+    {{ else }}
+    <a class="nav-link nav-item" href="/login">Войти</a>
+    <a class="nav-link nav-item" href="/new_user">Регистрация</a>
+    {{ end }}
+    </div>
+</nav>
 {{end}}

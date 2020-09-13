@@ -43,6 +43,15 @@ func addAuthCookie(w http.ResponseWriter, id string) {
 	http.SetCookie(w, &cookie)
 }
 
+func createDataOnContext(ctx context.Context) map[string]interface{} {
+	data := make(map[string]interface{})
+	if userName, ok := ctx.Value(contextUserNameKey).(string); ok {
+		data["UserName"] = userName
+	}
+
+	return data
+}
+
 func unsetAuthCookie(w http.ResponseWriter) {
 	cookie := http.Cookie{
 		Name:    authCookieName,

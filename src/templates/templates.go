@@ -63,8 +63,7 @@ func init() {
 
 // IndexPageHandler handles "/"" requests
 func IndexPageHandler(w http.ResponseWriter, r *http.Request) {
-	name := r.URL.Path[1:]
-	err := IndexPageTemplate.Execute(w, struct{ UserName string }{name})
+	err := IndexPageTemplate.Execute(w, createDataOnContext(r.Context()))
 	if err != nil {
 		log.Println(err)
 	}
@@ -72,7 +71,7 @@ func IndexPageHandler(w http.ResponseWriter, r *http.Request) {
 
 // ProfilePageHandler handles "/profile" requests
 func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
-	err := ProfilePageTemplate.Execute(w, struct{}{})
+	err := ProfilePageTemplate.Execute(w, createDataOnContext(r.Context()))
 	if err != nil {
 		log.Println(err)
 	}
@@ -80,23 +79,28 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 
 // LoginHandler accepts "/login" requests
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	data := createDataOnContext(r.Context())
 	if r.Method == "POST" {
 		login := r.FormValue("Login")
 		password := r.FormValue("Password")
 		sess, err := universe.Get().Auth.Login(login, password)
 		if err != nil {
 			log.Println(sess)
-			w.Write([]byte("Can't login"))
+			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 			return
 		}
 		if sess == nil {
-			w.Write([]byte("Can't login"))
+			data["InputError"] = "Введен неверный логин/пароль"
+			err := LoginPageTemplate.Execute(w, data)
+			if err != nil {
+				log.Println(err)
+			}
 			return
 		}
 		addAuthCookie(w, sess.ID)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	} else {
-		err := LoginPageTemplate.Execute(w, struct{}{})
+		err := LoginPageTemplate.Execute(w, data)
 		if err != nil {
 			log.Println(err)
 		}
@@ -105,6 +109,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 // NewUserHandler accepts "/new_user" requests
 func NewUserHandler(w http.ResponseWriter, r *http.Request) {
+	data := createDataOnContext(r.Context())
 	if r.Method == "POST" {
 		login := r.FormValue("Login")
 		password := r.FormValue("Password")
@@ -112,13 +117,17 @@ func NewUserHandler(w http.ResponseWriter, r *http.Request) {
 		sess, err := universe.Get().Auth.NewUser(&models.User{Login: login, PasswordShadow: password})
 		if err != nil {
 			log.Println(err)
-			w.Write([]byte("Can't create User"))
+			data["InputError"] = "Пользователь с таким именем уже существует"
+			err := NewUserPageTemplate.Execute(w, data)
+			if err != nil {
+				log.Println(err)
+			}
 			return
 		}
 		addAuthCookie(w, sess.ID)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	} else {
-		err := NewUserPageTemplate.Execute(w, struct{}{})
+		err := NewUserPageTemplate.Execute(w, data)
 		if err != nil {
 			log.Println(err)
 		}
@@ -144,7 +153,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 // LabelHandler accepts "/label" requests leading to labeling page
 // Login required
 func LabelHandler(w http.ResponseWriter, r *http.Request) {
-	err := LabelPageTemplate.Execute(w, struct{}{})
+	err := LabelPageTemplate.Execute(w, createDataOnContext(r.Context()))
 	if err != nil {
 		log.Println(err)
 	}

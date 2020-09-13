@@ -3,6 +3,8 @@ package auth
 import (
 	"log"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"../models"
 	"../repos/session"
 	"../repos/user"
@@ -30,7 +32,7 @@ func (auth *SimpleAuth) Login(login string, pass string) (*models.Session, error
 		return nil, err
 	}
 
-	if user == nil || user.PasswordShadow != pass {
+	if user == nil || bcrypt.CompareHashAndPassword([]byte(user.PasswordShadow), []byte(pass)) != nil {
 		return nil, nil
 	}
 
@@ -65,7 +67,15 @@ func (auth *SimpleAuth) CheckSession(id string) (*models.Session, error) {
 
 // NewUser new user
 func (auth *SimpleAuth) NewUser(u *models.User) (*models.Session, error) {
-	err := auth.userRepo.Insert(u)
+	u.ID = uint(uuid.New().ID())
+
+	pass, err := bcrypt.GenerateFromPassword([]byte(u.PasswordShadow), 6)
+	if err != nil {
+		log.Println("Can't create user", err)
+		return nil, err
+	}
+	u.PasswordShadow = string(pass)
+	err = auth.userRepo.Insert(u)
 	if err != nil {
 		log.Println("Can't create user", err)
 		return nil, err

@@ -1,11 +1,19 @@
 {{template "base" .}}
 
-{{define "title"}}Login{{end}}
+{{define "title"}}Signup{{end}}
 
 {{define "main"}}
-<form action="/new_user" method="POST">
-    <input name="Login">
-    <input name="Password" type="password">
-    <input type="submit">
-</form>
+<form class="form-signin" action="/new_user" method="POST">
+    <h1 class="h3 mb-3 font-weight-normal">Регистрация</h1>
+    {{ if .InputError }}
+    <p>{{ .InputError }}</p>
+    {{end}}
+    <label for="inputEmail" class="sr-only">Login</label>
+    <input id="inputEmail" class="form-control" placeholder="Login" name="Login" required autofocus>
+    <label for="inputPassword" class="sr-only">Пароль</label>
+    <input type="password" id="inputPassword" class="form-control" placeholder="Password" name="Password" required>
+    <label for="inputPassword" class="sr-only">Пароль</label>
+    <input type="password" id="inputPassword" class="form-control" placeholder="Repeat password" required>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Зарегестрироваться</button>
+  </form>
 {{end}}
