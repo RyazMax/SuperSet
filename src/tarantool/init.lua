@@ -5,6 +5,7 @@ local user = require('src.tarantool.user')
 local project = require('src.tarantool.project')
 local session = require('src.tarantool.session')
 local schema = require('src.tarantool.schema')
+local grant = require('src.tarantool.grant')
 
 box.cfg{
     listen = config.listen_port,
@@ -26,6 +27,10 @@ local function init()
         error(err)
     end
     ok, err = ddl.set_schema(session.schema)
+    if err then
+        error(err)
+    end
+    ok, err = ddl.set_schema(grant.schema)
     if err then
         error(err)
     end
