@@ -7,7 +7,6 @@ import (
 )
 
 var (
-	repo        Repo
 	testSession = models.Session{
 		ID:        "somehash",
 		UserLogin: "UserLogin",
