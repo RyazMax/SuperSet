@@ -21,6 +21,9 @@ type SimpleAuth struct {
 func (auth *SimpleAuth) Init(ur user.Repo, sr session.Repo) error {
 	auth.userRepo = ur
 	auth.sessionRepo = sr
+
+	// For testing
+	auth.NewUser(&models.User{Login: "admin", PasswordShadow: "admin"})
 	return nil
 }
 

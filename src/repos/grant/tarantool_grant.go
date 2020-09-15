@@ -59,3 +59,12 @@ func (tp *TarantoolRepo) DeleteByPairID(pid, uid int) error {
 	}
 	return err
 }
+
+// DeleteByProjectID deletes all grants of choosen project
+func (tp *TarantoolRepo) DeleteByProjectID(pid int) error {
+	_, err := tp.conn.Call("delete_grants_by_project_id", []interface{}{pid})
+	if err != nil {
+		log.Println(err)
+	}
+	return err
+}

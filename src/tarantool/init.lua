@@ -30,13 +30,11 @@ local function init()
     if err then
         error(err)
     end
-    ok, err = ddl.set_schema(grant.schema)
-    if err then
-        error(err)
-    end
 
     box.schema.user.create('go',  { password = 'go', if_not_exists = true })
     box.schema.user.grant('go', 'read,write', 'universe', nil, { if_not_exists = true })
+
+    grant.init()
 end
 
 init()

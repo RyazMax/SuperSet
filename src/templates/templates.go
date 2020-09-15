@@ -17,11 +17,12 @@ const (
 
 // Templates
 var (
-	IndexPageTemplate   *template.Template
-	ProfilePageTemplate *template.Template
-	LoginPageTemplate   *template.Template
-	NewUserPageTemplate *template.Template
-	LabelPageTemplate   *template.Template
+	IndexPageTemplate      *template.Template
+	ProfilePageTemplate    *template.Template
+	LoginPageTemplate      *template.Template
+	NewUserPageTemplate    *template.Template
+	LabelPageTemplate      *template.Template
+	NewProjectPageTemplate *template.Template
 )
 
 // Loading templates
@@ -56,6 +57,11 @@ func init() {
 	}
 
 	LabelPageTemplate, err = template.ParseFiles(append([]string{path.Join(HTMLRootDir, "label.html")}, baseTemplates...)...)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	NewProjectPageTemplate, err = template.ParseFiles(append([]string{path.Join(HTMLRootDir, "new_project.html")}, baseTemplates...)...)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -159,6 +165,15 @@ func LabelHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// NewProjectHandler accepts "/new_project" requests leading to new project construction
+// Login required
+func NewProjectHandler(w http.ResponseWriter, r *http.Request) {
+	err := NewProjectPageTemplate.Execute(w, createDataOnContext(r.Context()))
+	if err != nil {
+		log.Println(err)
+	}
+}
+
 // Handler returns http.Handler that serves web-site routes
 func Handler() http.Handler {
 	mux := http.NewServeMux()
@@ -166,6 +181,7 @@ func Handler() http.Handler {
 	mux.Handle("/new_user", notLoginRequired(http.HandlerFunc(NewUserHandler)))
 	mux.Handle("/login", notLoginRequired(http.HandlerFunc(LoginHandler)))
 
+	mux.Handle("/new_project", loginRequired(http.HandlerFunc(NewProjectHandler)))
 	mux.Handle("/profile", loginRequired(http.HandlerFunc(ProfilePageHandler)))
 	mux.Handle("/label", loginRequired(http.HandlerFunc(LabelHandler)))
 	mux.Handle("/logout", loginRequired(http.HandlerFunc(LogoutHandler)))

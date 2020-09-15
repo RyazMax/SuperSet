@@ -10,6 +10,10 @@ var testGrant = models.ProjectGrant{
 	ProjectID: 1,
 	UserID:    3,
 }
+var testGrant2 = models.ProjectGrant{
+	ProjectID: 1,
+	UserID:    4,
+}
 
 func TestGrantRepos(t *testing.T) {
 	repos := []Repo{
@@ -46,6 +50,20 @@ func TestGrantRepos(t *testing.T) {
 		}
 		if grant != nil {
 			t.Errorf("GetByPairID after Delete failed on %T, expected nil grant, got %v", repo, grant)
+		}
+
+		repo.Insert(&testGrant)
+		repo.Insert(&testGrant2)
+		err = repo.DeleteByProjectID(testGrant.ProjectID)
+		if err != nil {
+			t.Errorf("DeleteByProjectID failed on %T, with error %v", repo, err)
+		}
+		grant, err = repo.GetByPairID(testGrant.ProjectID, testGrant.UserID)
+		if err != nil {
+			t.Errorf("DeleteByProjectID failed on %T, on get by pair ID error %v", repo, err)
+		}
+		if grant != nil {
+			t.Errorf("DeleteByProjectID failed on %T, get by pair id expect nil, got %v", repo, grant)
 		}
 	}
 }

@@ -10,4 +10,5 @@ type Repo interface {
 	Insert(*models.ProjectGrant) error
 	GetByPairID(int, int) (*models.ProjectGrant, error)
 	DeleteByPairID(int, int) error
+	DeleteByProjectID(int) error
 }
