@@ -3,17 +3,31 @@
 {{define "title"}}Signup{{end}}
 
 {{define "main"}}
-<form class="form-signin" action="/new_user" method="POST">
+<form class="form-signin" action="/new_project" method="POST">
     <h1 class="h3 mb-3 font-weight-normal">Новый проект</h1>
     {{ if .InputError }}
     <p>{{ .InputError }}</p>
     {{end}}
-    <label for="inputEmail" class="sr-only">Login</label>
-    <input id="inputEmail" class="form-control" placeholder="Login" name="Login" required autofocus>
-    <label for="inputPassword" class="sr-only">Пароль</label>
-    <input type="password" id="inputPassword" class="form-control" placeholder="Password" name="Password" required>
-    <label for="inputPassword" class="sr-only">Пароль</label>
-    <input type="password" id="inputPassword" class="form-control" placeholder="Repeat password" required>
+    <label for="projectName" class="sr-only">Название проекта</label>
+    <input id="projectName" class="form-control" placeholder="Название проекта" name="projectName" required autofocus>
+    <div>
+      <input type="radio" id="ischemaChoice1"
+       name="ischema" value="Text">
+      <label for="contactChoice1">Текст</label>
+  
+      <input type="radio" id="ischemaChoice2"
+       name="ischema" value="Image">
+      <label for="contactChoice2">Картинка</label>
+    </div>
+    <div>
+      <input type="radio" id="oschemaChoice1"
+       name="oschema" value="Text">
+      <label for="contactChoice1">Текст</label>
+  
+      <input type="radio" id="oschemaChoice2"
+       name="oschema" value="Image">
+      <label for="contactChoice2">Классы</label>
+    </div>
     <button class="btn btn-lg btn-primary btn-block" type="submit">Cоздать</button>
   </form>
 {{end}}

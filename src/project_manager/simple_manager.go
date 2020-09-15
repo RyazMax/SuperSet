@@ -193,3 +193,8 @@ func (sm *SimpleManager) DeleteGrant(oname, pname, uname string) (bool, error) {
 
 	return true, nil
 }
+
+// Instance return instance of project aggr
+func Instance() *ProjectAggr {
+	return &ProjectAggr{}
+}

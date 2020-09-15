@@ -7,6 +7,7 @@ import (
 	"path"
 
 	"../models"
+	"../project_manager"
 	"../universe"
 )
 
@@ -105,12 +106,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		addAuthCookie(w, sess.ID)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-	} else {
-		err := LoginPageTemplate.Execute(w, data)
-		if err != nil {
-			log.Println(err)
-		}
+		return
 	}
+	err := LoginPageTemplate.Execute(w, data)
+	if err != nil {
+		log.Println(err)
+	}
+
 }
 
 // NewUserHandler accepts "/new_user" requests
@@ -132,11 +134,11 @@ func NewUserHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		addAuthCookie(w, sess.ID)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-	} else {
-		err := NewUserPageTemplate.Execute(w, data)
-		if err != nil {
-			log.Println(err)
-		}
+		return
+	}
+	err := NewUserPageTemplate.Execute(w, data)
+	if err != nil {
+		log.Println(err)
 	}
 }
 
@@ -168,6 +170,34 @@ func LabelHandler(w http.ResponseWriter, r *http.Request) {
 // NewProjectHandler accepts "/new_project" requests leading to new project construction
 // Login required
 func NewProjectHandler(w http.ResponseWriter, r *http.Request) {
+	data := createDataOnContext(r.Context())
+	if r.Method == "POST" {
+		prName := r.FormValue("projectName")
+		ischemaType := r.FormValue("ischema")
+		oschemaType := r.FormValue("oschema")
+		ischema := models.InputTypeToStructMap(ischemaType)
+		oschema := models.OutputTypeToStructMap(oschemaType)
+		uname, _ := data["UserName"].(string)
+		user, _ := universe.Get().UserRepo.GetByLogin(uname)
+		prAggr := project_manager.ProjectAggr{
+			Project: models.Project{
+				Name:    prName,
+				OwnerID: int(user.ID),
+			},
+			Schema: models.ProjectSchema{
+				InputSchema:  ischema,
+				OutputSchema: oschema,
+			},
+		}
+		ok, err := universe.Get().ProjectManager.Create(&prAggr)
+		if !ok {
+			log.Println(err)
+		} else if err != nil {
+			data["InputError"] = err.Error()
+		}
+		http.Redirect(w, r, "/project", http.StatusTemporaryRedirect)
+		return
+	}
 	err := NewProjectPageTemplate.Execute(w, createDataOnContext(r.Context()))
 	if err != nil {
 		log.Println(err)
