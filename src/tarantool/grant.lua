@@ -52,7 +52,7 @@ function grant.init()
         error(err)
     end
 
-    box.schema.func.create('delete_grants_by_project_id')
+    box.schema.func.create('delete_grants_by_project_id', {if_not_exists=true})
     box.schema.user.grant('go', 'execute', 'function', 'delete_grants_by_project_id', {if_not_exists=true})
 end
 

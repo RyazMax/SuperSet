@@ -6,6 +6,8 @@ local project = require('src.tarantool.project')
 local session = require('src.tarantool.session')
 local schema = require('src.tarantool.schema')
 local grant = require('src.tarantool.grant')
+local labeledtask = require('src.tarantool.labeledtask')
+local tasks = require('src.tarantool.tasks')
 
 box.cfg{
     listen = config.listen_port,
@@ -35,6 +37,8 @@ local function init()
     box.schema.user.grant('go', 'read,write', 'universe', nil, { if_not_exists = true })
 
     grant.init()
+    labeledtask.init()
+    tasks.init()
 end
 
 init()

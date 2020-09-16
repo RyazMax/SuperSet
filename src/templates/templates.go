@@ -177,6 +177,11 @@ func NewProjectHandler(w http.ResponseWriter, r *http.Request) {
 		oschemaType := r.FormValue("oschema")
 		ischema := models.InputTypeToStructMap(ischemaType)
 		oschema := models.OutputTypeToStructMap(oschemaType)
+		if ischema == nil || oschema == nil {
+			data["InputError"] = "Неверный формат ввода/вывода"
+			return
+		}
+
 		uname, _ := data["UserName"].(string)
 		user, _ := universe.Get().UserRepo.GetByLogin(uname)
 		prAggr := project_manager.ProjectAggr{

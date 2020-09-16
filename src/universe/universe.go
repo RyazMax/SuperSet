@@ -6,9 +6,11 @@ import (
 	"../auth"
 	"../project_manager"
 	"../repos/grant"
+	"../repos/labeledtask"
 	"../repos/project"
 	"../repos/schema"
 	"../repos/session"
+	"../repos/task"
 	"../repos/user"
 )
 
@@ -19,6 +21,8 @@ type Universe struct {
 	SessionRepo    session.Repo
 	GrantRepo      grant.Repo
 	SchemaRepo     schema.Repo
+	TaskRepo       task.Repo
+	LabeledRepo    labeledtask.Repo
 	Auth           auth.Auth
 	ProjectManager project_manager.ProjectManager
 }
@@ -60,14 +64,28 @@ func Init(host string, port int) error {
 	if err != nil {
 		return err
 	}
-	deferNotInited(grantRepo.Drop)
+	defer deferNotInited(grantRepo.Drop)
 
 	schemaRepo := schema.TarantoolRepo{}
 	err = schemaRepo.Init(host, port)
 	if err != nil {
 		return err
 	}
-	deferNotInited(schemaRepo.Drop)
+	defer deferNotInited(schemaRepo.Drop)
+
+	taskRepo := task.TarantoolRepo{}
+	err = taskRepo.Init(host, port)
+	if err != nil {
+		return err
+	}
+	defer deferNotInited(taskRepo.Drop)
+
+	labeledRepo := labeledtask.TarantoolRepo{}
+	err = labeledRepo.Init(host, port)
+	if err != nil {
+		return err
+	}
+	defer deferNotInited(labeledRepo.Drop)
 
 	authInstance := auth.SimpleAuth{}
 	err = authInstance.Init(&userRepo, &sessionRepo)
@@ -76,7 +94,7 @@ func Init(host string, port int) error {
 	}
 
 	projectManager := project_manager.SimpleManager{}
-	err = projectManager.Init(&userRepo, &projectRepo, &grantRepo, &schemaRepo)
+	err = projectManager.Init(&userRepo, &projectRepo, &grantRepo, &schemaRepo, &taskRepo)
 	if err != nil {
 		return err
 	}
@@ -87,6 +105,8 @@ func Init(host string, port int) error {
 		SessionRepo:    &sessionRepo,
 		GrantRepo:      &grantRepo,
 		SchemaRepo:     &schemaRepo,
+		TaskRepo:       &taskRepo,
+		LabeledRepo:    &labeledRepo,
 		Auth:           &authInstance,
 		ProjectManager: &projectManager,
 	}

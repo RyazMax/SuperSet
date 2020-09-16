@@ -10,6 +10,7 @@ import (
 	"../repos/grant"
 	"../repos/project"
 	"../repos/schema"
+	"../repos/task"
 	"../repos/user"
 )
 
@@ -19,6 +20,7 @@ type SimpleManager struct {
 	projectRepo project.Repo
 	schemaRepo  schema.Repo
 	grantRepo   grant.Repo
+	taskRepo    task.Repo
 }
 
 func (sm *SimpleManager) isOwner(uname string, oid int) *models.User {
@@ -38,11 +40,12 @@ func (sm *SimpleManager) isOwner(uname string, oid int) *models.User {
 }
 
 // Init init
-func (sm *SimpleManager) Init(ur user.Repo, pr project.Repo, gr grant.Repo, sr schema.Repo) error {
+func (sm *SimpleManager) Init(ur user.Repo, pr project.Repo, gr grant.Repo, sr schema.Repo, tr task.Repo) error {
 	sm.userRepo = ur
 	sm.projectRepo = pr
 	sm.schemaRepo = sr
 	sm.grantRepo = gr
+	sm.taskRepo = tr
 	return nil
 }
 
@@ -73,10 +76,17 @@ func (sm *SimpleManager) Create(pa *ProjectAggr) (bool, error) {
 	}
 	err = sm.schemaRepo.Insert(&pa.Schema)
 	if err != nil {
+		log.Println("Can't insert schema", err)
 		return false, err
 	}
 	err = sm.grantRepo.Insert(&models.ProjectGrant{ProjectID: pa.Project.ID, UserID: int(owner.ID)})
 	if err != nil {
+		log.Println("Can't insert grant", err)
+		return false, err
+	}
+	err = sm.taskRepo.CreateTube(pa.Project.Name)
+	if err != nil {
+		log.Println("Can't insert tube", err)
 		return false, err
 	}
 
@@ -107,6 +117,10 @@ func (sm *SimpleManager) DeleteByName(uname, pname string) (bool, error) {
 		return false, err
 	}
 	err = sm.grantRepo.DeleteByProjectID(project.ID)
+	if err != nil {
+		return false, err
+	}
+	err = sm.taskRepo.DropTube(pname)
 	if err != nil {
 		return false, err
 	}

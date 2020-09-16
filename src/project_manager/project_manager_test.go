@@ -7,6 +7,7 @@ import (
 	"../repos/grant"
 	"../repos/project"
 	"../repos/schema"
+	"../repos/task"
 	"../repos/user"
 )
 
@@ -42,12 +43,14 @@ func TestProjectManagers(t *testing.T) {
 	sr := &schema.TarantoolRepo{}
 	gr := &grant.TarantoolRepo{}
 	pr := &project.TarantoolRepo{}
+	tr := &task.TarantoolRepo{}
 	ur.Init(host, port)
 	sr.Init(host, port)
 	gr.Init(host, port)
 	pr.Init(host, port)
+	tr.Init(host, port)
 	for _, manager := range managers {
-		err := manager.Init(ur, pr, gr, sr)
+		err := manager.Init(ur, pr, gr, sr, tr)
 		if err != nil {
 			t.Errorf("Init failed on %T, with error %v", manager, err)
 		}
