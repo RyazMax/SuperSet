@@ -9,9 +9,7 @@ local function take_task_by_projects(...)
     local projs = {...}
     local task
     for i = 1,ITERATIONS_NUM do
-        print("ALL" , projs)
         for _, proj in ipairs(projs[1]) do
-            print("Processing proj", proj)
             task = queue.tube[proj]:take(PER_PROJECT_TIMEOUT)
             if task ~= nil then
                 return task

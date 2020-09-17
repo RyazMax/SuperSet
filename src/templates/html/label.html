@@ -37,7 +37,7 @@
 {{ end }}
 
 <!-- Output data formating -->
-<form>
+<form method="POST" action="/label">
 {{ if eq .OutputType "Integer"}}
 <input name="IntegerData">
 {{ end }}
@@ -61,6 +61,7 @@
 
 <input type="hidden" name="projectID" value="{{.ProjectID}}">
 <input type="hidden" name="queuetaskID" value="{{ .TaskID }}">
+<input type="hidden" name="originID" value="{{.OriginID }}">
 <input type="hidden" name="Projects" value="{{.Projects }}">
 <button type="submit" class="btn btn-lg btn-primary btn-block">Отправить</button>
 </form>

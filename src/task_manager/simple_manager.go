@@ -72,8 +72,8 @@ func (sm *SimpleManager) LabelTask(tws *models.TaskAggr, lt *models.LabeledTask)
 		return err
 	}
 
+	lt.ID = int(uuid.New().ID())
 	lt.ProjectID = tws.Tsk.ProjectID
-	lt.OriginID = tws.Tsk.ID
 	err = sm.LabeledRepo.Insert(lt)
 	if err != nil {
 		log.Println("Can't insert labeled task", err)

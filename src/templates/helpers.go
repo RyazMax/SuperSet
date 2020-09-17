@@ -2,8 +2,11 @@ package templates
 
 import (
 	"context"
+	"encoding/csv"
+	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"../models"
@@ -96,4 +99,33 @@ func passUserName(next http.Handler) http.Handler {
 		}
 		next.ServeHTTP(w, r)
 	})
+}
+
+type OutputElem struct {
+	ID   int
+	Data string
+}
+
+func jsonDataFormatter(w http.ResponseWriter, lts []models.LabeledTask) {
+	data := make([]OutputElem, len(lts))
+
+	for i, val := range lts {
+		data[i].ID = val.OriginID
+		data[i].Data = val.AnswerJSON
+	}
+
+	encoder := json.NewEncoder(w)
+	encoder.Encode(data)
+}
+
+func csvDataFormatter(w http.ResponseWriter, lts []models.LabeledTask) {
+	writer := csv.NewWriter(w)
+	writer.Write([]string{"ID", "Data"})
+
+	for _, val := range lts {
+		writer.Write([]string{strconv.Itoa(val.OriginID), val.AnswerJSON})
+	}
+
+	writer.Flush()
+	return
 }

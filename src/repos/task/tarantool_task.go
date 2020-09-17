@@ -48,11 +48,9 @@ func (tr *TarantoolRepo) TakeTask(projs []string) (*models.TaskAggr, error) {
 		log.Println(err)
 		return nil, err
 	}
-	log.Println("Getting projs", projs, "with task", t)
 	if len(t) == 0 {
 		return nil, nil
 	}
-	log.Println(t[0].ID)
 	if t[0].ID == -1 {
 		return nil, nil
 	}

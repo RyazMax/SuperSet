@@ -1,6 +1,7 @@
 package templates
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -33,6 +34,7 @@ var (
 	NewProjectPageTemplate *template.Template
 	UploadPageTemplate     *template.Template
 	StartLabelPageTemplate *template.Template
+	DownloadPageTemplate   *template.Template
 )
 
 // Loading templates
@@ -82,6 +84,11 @@ func init() {
 	}
 
 	StartLabelPageTemplate, err = template.ParseFiles(append([]string{path.Join(HTMLRootDir, "start_label.html")}, baseTemplates...)...)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	DownloadPageTemplate, err = template.ParseFiles(append([]string{path.Join(HTMLRootDir, "download.html")}, baseTemplates...)...)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -182,24 +189,30 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 func LabelHandler(w http.ResponseWriter, r *http.Request) {
 	data := createDataOnContext(r.Context())
 	if r.Method == "POST" {
-		pid, _ := strconv.Atoi(r.FormValue("ProjectID"))
-		tid, _ := strconv.Atoi(r.FormValue("TaskID"))
+		log.Println("BEGIN")
+		pid, _ := strconv.Atoi(r.FormValue("projectID"))
+		tid, _ := strconv.Atoi(r.FormValue("queuetaskID"))
+		oid, _ := strconv.Atoi(r.FormValue("originID"))
+		log.Println("BEFORE GET PROJECT", pid, tid)
 		schema, err := universe.Get().SchemaRepo.GetByProjectID(pid)
+		log.Println("SCHEMA", schema)
 		if err != nil || schema == nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "ERROR or nil schema", http.StatusInternalServerError)
 			return
 		}
 		ltask, err := schema.OutputSchema.FormatLabeledTask(r)
 		if err != nil {
+			log.Println(err)
 			// handle err
 			return
 		}
+		ltask.OriginID = oid
 
+		log.Println("Smth", ltask)
 		tsk := models.TaskAggr{ID: tid, Tsk: models.Task{ProjectID: pid}}
 		err = universe.Get().TaskManager.LabelTask(&tsk, ltask)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			//http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
 
@@ -213,6 +226,7 @@ func LabelHandler(w http.ResponseWriter, r *http.Request) {
 	if task != nil {
 		data["TaskFound"] = true
 		data["ProjectID"] = task.Tsk.Tsk.ProjectID
+		data["OriginID"] = task.Tsk.Tsk.ID
 		data["TaskID"] = task.Tsk.ID // For queue
 		data["InputType"] = task.Schema.InputSchema.InputType()
 		data["OutputType"] = task.Schema.OutputSchema.OutputType()
@@ -315,6 +329,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		mapping := []interface{}{}
 		//get the *fileheaders
 		files := m.File["dataFile"]
 		for i, _ := range files {
@@ -357,14 +372,85 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 			}
+			mapping = append(mapping, []interface{}{files[i].Filename, id})
 		}
-
-		fmt.Fprintf(w, "Successfully uploaded")
+		w.Header().Set("Content-Disposition", "attachment; filename=mapping.json")
+		encoder := json.NewEncoder(w)
+		encoder.Encode(mapping)
+		return
 	} else {
 		err := UploadPageTemplate.Execute(w, data)
 		if err != nil {
 			log.Println(err)
 		}
+	}
+}
+
+func DownloadHandler(w http.ResponseWriter, r *http.Request) {
+	data := createDataOnContext(r.Context())
+	if r.Method == "POST" {
+		projectName := r.FormValue("projectName")
+		outputType := r.FormValue("type")
+		ts := r.FormValue("timestamp")
+		originID := r.FormValue("originID")
+
+		project, err := universe.Get().ProjectRepo.GetByName(projectName)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if project == nil {
+			http.Error(w, "Project not found", http.StatusNotFound)
+			return
+		}
+
+		var ltsks []models.LabeledTask
+		if originID != "" {
+			origin, err := strconv.Atoi(originID)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			tsk, err := universe.Get().LabeledRepo.GetByOriginID(project.ID, origin)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			if tsk != nil {
+				ltsks = []models.LabeledTask{*tsk}
+			}
+		} else if ts != "" {
+			tstamp, err := strconv.Atoi(ts)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			ltsks, err = universe.Get().LabeledRepo.GetGreaterTime(project.ID, uint64(tstamp))
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+		} else {
+			ltsks, err = universe.Get().LabeledRepo.GetByProjectID(project.ID)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+		}
+
+		w.Header().Set("Content-Disposition", "attachment; filename=dataset."+outputType)
+		if outputType == "json" {
+			jsonDataFormatter(w, ltsks)
+		} else if outputType == "csv" {
+			csvDataFormatter(w, ltsks)
+		} else {
+			http.Error(w, "Bad format", http.StatusNotImplemented)
+		}
+		return
+	}
+	err := DownloadPageTemplate.Execute(w, data)
+	if err != nil {
+		log.Println(err)
 	}
 }
 
@@ -381,6 +467,7 @@ func Handler() http.Handler {
 	mux.Handle("/label", loginRequired(http.HandlerFunc(LabelHandler)))
 	mux.Handle("/logout", loginRequired(http.HandlerFunc(LogoutHandler)))
 	mux.Handle("/upload", loginRequired(http.HandlerFunc(UploadHandler)))
+	mux.Handle("/download", loginRequired(http.HandlerFunc(DownloadHandler)))
 	mux.Handle("/", passUserName(http.HandlerFunc(IndexPageHandler)))
 
 	return mux
