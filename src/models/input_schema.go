@@ -1,8 +1,19 @@
 package models
 
+import (
+	"errors"
+	"fmt"
+	"io/ioutil"
+	"mime/multipart"
+	"path/filepath"
+)
+
 // IInputSchema is interface for input schemas
 type IInputSchema interface {
 	InputType() string
+
+	Validate(string, multipart.File) (*Task, error)
+	SaveName(string, int) string
 }
 
 const (
@@ -33,6 +44,23 @@ func (ts TextInputSchema) InputType() string {
 	return TextInputType
 }
 
+func (ts TextInputSchema) Validate(name string, file multipart.File) (*Task, error) {
+	ext := filepath.Ext(name)
+	if ext != ".txt" {
+		return nil, errors.New("Текстовая схема требует .txt файлы")
+	}
+	text, _ := ioutil.ReadAll(file)
+
+	task := Task{
+		DataJSON: string(text), // Not JSON but ok:)
+	}
+	return &task, nil
+}
+
+func (ts TextInputSchema) SaveName(name string, id int) string {
+	return ""
+}
+
 // TableInputSchema table values input implementation
 type TableInputSchema struct {
 	ColumnsNumber int
@@ -44,6 +72,25 @@ func (ts TableInputSchema) InputType() string {
 	return TableInputType
 }
 
+func (ts TableInputSchema) Validate(name string, file multipart.File) (*Task, error) {
+	ext := filepath.Ext(name)
+	if ext != ".csv" {
+		return nil, errors.New("Текстовая схема требует .txt файлы")
+	}
+	text, _ := ioutil.ReadAll(file)
+
+	// Do something with csv?
+
+	task := Task{
+		DataJSON: string(text), // Not JSON but ok:)
+	}
+	return &task, nil
+}
+
+func (ts TableInputSchema) SaveName(name string, id int) string {
+	return ""
+}
+
 // ImageInputSchema is for images inputs
 type ImageInputSchema struct {
 }
@@ -51,4 +98,20 @@ type ImageInputSchema struct {
 // InputType implements IInputSchema
 func (is ImageInputSchema) InputType() string {
 	return ImageInputType
+}
+
+// Validate create new task on schema if possible
+func (is ImageInputSchema) Validate(name string, file multipart.File) (*Task, error) {
+	ext := filepath.Ext(name)
+	if ext != ".png" && ext != ".jpg" && ext != ".jpeg" {
+		return nil, errors.New("Текстовая схема требует .jpg файлы")
+	}
+	// Do something with csv?
+
+	task := Task{}
+	return &task, nil
+}
+
+func (is ImageInputSchema) SaveName(name string, id int) string {
+	return fmt.Sprintf("%s-%d", name, id)
 }

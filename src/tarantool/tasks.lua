@@ -20,14 +20,16 @@ end
 
 function take_aggr_by_projects(...)
     local task = take_task_by_projects(...)
+    local empty
     if task == nil then
-        return nil
+        return -1
     end
 
     return {task[1], task[3]} -- DataPart and ID part
 end
 
-function ack_task(proj, id)
+function ack_task(pid, id)
+    local proj = box.space.projects:get{pid}['Name']
     queue.tube[proj]:ack(id)
 end
 

@@ -17,6 +17,12 @@ type TaskAggr struct {
 	Tsk Task
 }
 
+// TaskWithSchema also has schema
+type TaskWithSchema struct {
+	TaskAggr
+	Schema *ProjectSchema
+}
+
 // LabeledTask stored after labeling
 type LabeledTask struct {
 	_msgpack struct{} `msgpack:",asArray"`

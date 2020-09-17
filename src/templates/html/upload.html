@@ -1,0 +1,11 @@
+{{template "base" .}}
+
+{{define "title"}}SuperSet{{end}}
+
+{{define "main"}}
+<form action="/upload" method="POST" enctype="multipart/form-data" >
+    <input name="projectName">
+    <input type="file" name="dataFile" multiple/>
+    <input type="submit" value="upload" />
+</form>
+{{end}}

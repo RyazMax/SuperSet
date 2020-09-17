@@ -12,6 +12,7 @@ import (
 	"../repos/session"
 	"../repos/task"
 	"../repos/user"
+	"../task_manager"
 )
 
 // Universe is singleton object for this app
@@ -25,6 +26,7 @@ type Universe struct {
 	LabeledRepo    labeledtask.Repo
 	Auth           auth.Auth
 	ProjectManager project_manager.ProjectManager
+	TaskManager    task_manager.TaskManager
 }
 
 var single *Universe
@@ -99,6 +101,12 @@ func Init(host string, port int) error {
 		return err
 	}
 
+	taskManager := task_manager.SimpleManager{}
+	err = taskManager.Init(&taskRepo, &labeledRepo, &schemaRepo)
+	if err != nil {
+		return err
+	}
+
 	single = &Universe{
 		UserRepo:       &userRepo,
 		ProjectRepo:    &projectRepo,
@@ -109,6 +117,7 @@ func Init(host string, port int) error {
 		LabeledRepo:    &labeledRepo,
 		Auth:           &authInstance,
 		ProjectManager: &projectManager,
+		TaskManager:    &taskManager,
 	}
 	inited = true
 	return nil

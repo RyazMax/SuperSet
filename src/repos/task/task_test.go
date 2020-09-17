@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"../../models"
+	"../project"
 	"../schema"
 )
 
@@ -20,7 +21,13 @@ var (
 		InputSchema:  models.TextInputSchema{},
 		OutputSchema: models.TextOutputSchema{},
 	}
-	schemaRepo = schema.TarantoolRepo{}
+	testProject = models.Project{
+		ID:      1,
+		OwnerID: 1,
+		Name:    "Tester",
+	}
+	schemaRepo  = schema.TarantoolRepo{}
+	projectRepo = project.TarantoolRepo{}
 )
 
 func TestRepos(t *testing.T) {
@@ -29,6 +36,7 @@ func TestRepos(t *testing.T) {
 	}
 
 	schemaRepo.Init(host, port)
+	projectRepo.Init(host, port)
 
 	for _, repo := range repos {
 		err := repo.Init(host, port)
@@ -47,6 +55,7 @@ func TestRepos(t *testing.T) {
 		}
 
 		schemaRepo.Insert(&testSchema)
+		projectRepo.Insert(&testProject)
 
 		aggr, err := repo.TakeTask([]string{"Tester"})
 		if err != nil {
@@ -56,15 +65,26 @@ func TestRepos(t *testing.T) {
 			t.Errorf("TakeTask failed expected not nil aggr")
 		}
 
-		schemaRepo.DeleteByProjectID(testSchema.ProjectID)
-		err = repo.AckTask("Tester", aggr.ID)
+		aggr2, err := repo.TakeTask([]string{"Tester"})
+		if err != nil {
+			t.Errorf("TakeTask 2 try failed with %v", err)
+		}
+		if aggr2 != nil {
+			t.Errorf("TakeTask 2 try failed, expected nil aggr, found %v", aggr)
+		}
+
+		err = repo.AckTask(aggr.Tsk.ProjectID, aggr.ID)
 		if err != nil {
 			t.Errorf("AckTask failed with %v", err)
 		}
+
+		schemaRepo.DeleteByProjectID(testSchema.ProjectID)
 
 		err = repo.DropTube("Tester")
 		if err != nil {
 			t.Errorf("DropTube failed with %v", err)
 		}
+
+		projectRepo.DeleteByID(testSchema.ProjectID)
 	}
 }

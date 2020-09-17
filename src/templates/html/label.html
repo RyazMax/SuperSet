@@ -3,7 +3,46 @@
 {{define "title"}}Labeling{{end}}
 
 {{define "main"}}
-<table>
-    <h1>There you will be able to lable data</h1>
-</table>
+
+{{ if .TaskFound }}
+<!-- Input data formating -->
+{{ if eq .InputType "PlainText"}}
+<p>{{ .Text }}</p>
+{{ end}}
+
+{{ if eq .InputType "TableData"}}
+<strong>Not supported yet</strong>
+{{ end }}
+
+{{ if eq .InputType "Image"}}
+<img src="{{.ImgSrc}}">
+{{ end }}
+
+<!-- Output data formating -->
+<form>
+{{ if eq .OutputType "Integer"}}
+<input name="IntegerData">
+{{ end }}
+
+{{ if eq .OutputType "Float"}}
+<input name="FloatData">
+{{ end }}
+
+{{ if eq .OutputType "ClassData"}}
+<div>
+    <!-- Something about classes-->
+</div>
+{{ end }}
+
+{{ if eq .OutputType "PlainText"}}
+<input name="TextData">
+{{ end }}
+
+<button type="submit">Отправить</button>
+</form>
+{{ else }}
+
+<h1>Извините у этого проекта не осталось не размеченных данных </h1> 
+
+{{ end }}
 {{end}}

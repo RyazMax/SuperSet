@@ -21,3 +21,4 @@ src/tarantool/data
 
 # other
 .vscode
+data

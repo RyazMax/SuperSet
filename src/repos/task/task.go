@@ -13,7 +13,7 @@ type Repo interface {
 	DropTube(proj string) error
 
 	TakeTask(projs []string) (*models.TaskAggr, error)
-	AckTask(proj string, id int) error
+	AckTask(pid int, id int) error
 
 	Drop()
 }
