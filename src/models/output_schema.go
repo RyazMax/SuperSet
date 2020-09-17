@@ -1,8 +1,13 @@
 package models
 
+import "net/http"
+
 // IOutputSchema describes output schema of dataset
 type IOutputSchema interface {
 	OutputType() string
+
+	FormatOutputData(*Task, map[string]interface{})
+	FormatLabeledTask(r *http.Request) (*LabeledTask, error)
 }
 
 const (
@@ -39,6 +44,16 @@ func (is IntOutputSchema) OutputType() string {
 	return IntOutputType
 }
 
+func (is IntOutputSchema) FormatOutputData(t *Task, data map[string]interface{}) {
+}
+
+func (is IntOutputSchema) FormatLabeledTask(r *http.Request) (*LabeledTask, error) {
+	t := LabeledTask{
+		AnswerJSON: r.FormValue("IntegerData"),
+	}
+	return &t, nil
+}
+
 // FloatOutputSchema is struct for float regression tasks
 type FloatOutputSchema struct {
 	IsLimited   bool
@@ -51,6 +66,16 @@ func (fs FloatOutputSchema) OutputType() string {
 	return FloatOutputType
 }
 
+func (fs FloatOutputSchema) FormatOutputData(t *Task, data map[string]interface{}) {
+}
+
+func (fs FloatOutputSchema) FormatLabeledTask(r *http.Request) (*LabeledTask, error) {
+	t := LabeledTask{
+		AnswerJSON: r.FormValue("FloatData"),
+	}
+	return &t, nil
+}
+
 // ClassOutputSchema for classification task
 type ClassOutputSchema struct {
 	ClassNames []string
@@ -59,6 +84,17 @@ type ClassOutputSchema struct {
 // OutputType implementation of IOutputSchema
 func (cs ClassOutputSchema) OutputType() string {
 	return ClassOutputType
+}
+
+func (cs ClassOutputSchema) FormatOutputData(t *Task, data map[string]interface{}) {
+	data["Classes"] = cs.ClassNames
+}
+
+func (cs ClassOutputSchema) FormatLabeledTask(r *http.Request) (*LabeledTask, error) {
+	t := LabeledTask{
+		AnswerJSON: r.FormValue("ClassLabel"),
+	}
+	return &t, nil
 }
 
 // TextOutputSchema for text answers
@@ -70,4 +106,14 @@ type TextOutputSchema struct {
 // OutputType implementation of IOutputSchema
 func (ts TextOutputSchema) OutputType() string {
 	return TextOutputType
+}
+
+func (ts TextOutputSchema) FormatOutputData(t *Task, data map[string]interface{}) {
+}
+
+func (ts TextOutputSchema) FormatLabeledTask(r *http.Request) (*LabeledTask, error) {
+	t := LabeledTask{
+		AnswerJSON: r.FormValue("TextData"),
+	}
+	return &t, nil
 }

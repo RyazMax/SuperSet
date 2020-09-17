@@ -61,11 +61,11 @@ func (sm *SimpleManager) TakeTask(projs []string) (*models.TaskWithSchema, error
 	if schema == nil {
 		log.Panicf("Can't find schema[%d]", task.Tsk.ProjectID)
 	}
-	return &models.TaskWithSchema{*task, schema}, nil
+	return &models.TaskWithSchema{Tsk: task, Schema: schema}, nil
 }
 
 // LabelTask ackquire task and put its labeled data into special space
-func (sm *SimpleManager) LabelTask(tws *models.TaskWithSchema, lt *models.LabeledTask) error {
+func (sm *SimpleManager) LabelTask(tws *models.TaskAggr, lt *models.LabeledTask) error {
 	err := sm.TaskRepo.AckTask(tws.Tsk.ProjectID, tws.ID)
 	if err != nil {
 		log.Println("Can't ack task", err)

@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strconv"
+	"strings"
 
 	"../models"
 	"../project_manager"
@@ -18,7 +20,7 @@ const (
 	// HTMLRootDir points to folder where html templates are located
 	HTMLRootDir = "src/templates/html"
 	// MediaDir dir where uploaded datasets are located
-	MediaDir = "data/media"
+	MediaDir = "src/static/media"
 )
 
 // Templates
@@ -30,6 +32,7 @@ var (
 	LabelPageTemplate      *template.Template
 	NewProjectPageTemplate *template.Template
 	UploadPageTemplate     *template.Template
+	StartLabelPageTemplate *template.Template
 )
 
 // Loading templates
@@ -74,6 +77,11 @@ func init() {
 	}
 
 	UploadPageTemplate, err = template.ParseFiles(append([]string{path.Join(HTMLRootDir, "upload.html")}, baseTemplates...)...)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	StartLabelPageTemplate, err = template.ParseFiles(append([]string{path.Join(HTMLRootDir, "start_label.html")}, baseTemplates...)...)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -174,24 +182,72 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 func LabelHandler(w http.ResponseWriter, r *http.Request) {
 	data := createDataOnContext(r.Context())
 	if r.Method == "POST" {
-		return
+		pid, _ := strconv.Atoi(r.FormValue("ProjectID"))
+		tid, _ := strconv.Atoi(r.FormValue("TaskID"))
+		schema, err := universe.Get().SchemaRepo.GetByProjectID(pid)
+		if err != nil || schema == nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		ltask, err := schema.OutputSchema.FormatLabeledTask(r)
+		if err != nil {
+			// handle err
+			return
+		}
+
+		tsk := models.TaskAggr{ID: tid, Tsk: models.Task{ProjectID: pid}}
+		err = universe.Get().TaskManager.LabelTask(&tsk, ltask)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
-	task, err := universe.Get().TaskManager.TakeTask([]string{"Tester"})
+	projects := strings.Split(r.FormValue("Projects"), ";")
+	log.Println(projects)
+	task, err := universe.Get().TaskManager.TakeTask(projects)
 	if err != nil {
 		log.Println("LabelHandler error on getting task", err)
 	}
+	data["Projects"] = strings.Join(projects, ";")
 	if task != nil {
 		data["TaskFound"] = true
+		data["ProjectID"] = task.Tsk.Tsk.ProjectID
+		data["TaskID"] = task.Tsk.ID // For queue
 		data["InputType"] = task.Schema.InputSchema.InputType()
-		// some proccesing for task Data
 		data["OutputType"] = task.Schema.OutputSchema.OutputType()
-		// some processing for task schema
+		task.Schema.InputSchema.FormatInputData(&task.Tsk.Tsk, data)
+		task.Schema.OutputSchema.FormatOutputData(&task.Tsk.Tsk, data)
 	}
 	err = LabelPageTemplate.Execute(w, data)
 	if err != nil {
 		log.Println(err)
 	}
+}
+
+// StartLabelHandler starts labeling process
+func StartLabelHandler(w http.ResponseWriter, r *http.Request) {
+	data := createDataOnContext(r.Context())
+	if r.Method == "POST" {
+		projName := r.FormValue("projectName")
+		proj, err := universe.Get().ProjectRepo.GetByName(projName)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if proj == nil {
+			log.Printf("Project %s not found", projName)
+			// Handle nil
+			return
+		}
+		log.Printf("Start ok %s", projName)
+		http.Redirect(w, r, "/label?Projects="+strings.Join([]string{projName}, ";"), 303) // Redirect
+	}
+	err := StartLabelPageTemplate.Execute(w, data)
+	if err != nil {
+		log.Println(err)
+	}
+
 }
 
 // NewProjectHandler accepts "/new_project" requests leading to new project construction
@@ -321,6 +377,7 @@ func Handler() http.Handler {
 
 	mux.Handle("/new_project", loginRequired(http.HandlerFunc(NewProjectHandler)))
 	mux.Handle("/profile", loginRequired(http.HandlerFunc(ProfilePageHandler)))
+	mux.Handle("/start_label", loginRequired(http.HandlerFunc(StartLabelHandler)))
 	mux.Handle("/label", loginRequired(http.HandlerFunc(LabelHandler)))
 	mux.Handle("/logout", loginRequired(http.HandlerFunc(LogoutHandler)))
 	mux.Handle("/upload", loginRequired(http.HandlerFunc(UploadHandler)))

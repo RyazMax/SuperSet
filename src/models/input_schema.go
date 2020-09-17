@@ -14,6 +14,8 @@ type IInputSchema interface {
 
 	Validate(string, multipart.File) (*Task, error)
 	SaveName(string, int) string
+
+	FormatInputData(*Task, map[string]interface{})
 }
 
 const (
@@ -61,6 +63,10 @@ func (ts TextInputSchema) SaveName(name string, id int) string {
 	return ""
 }
 
+func (ts TextInputSchema) FormatInputData(t *Task, data map[string]interface{}) {
+	data["Text"] = t.DataJSON
+}
+
 // TableInputSchema table values input implementation
 type TableInputSchema struct {
 	ColumnsNumber int
@@ -91,6 +97,9 @@ func (ts TableInputSchema) SaveName(name string, id int) string {
 	return ""
 }
 
+func (ts TableInputSchema) FormatInputData(t *Task, data map[string]interface{}) {
+}
+
 // ImageInputSchema is for images inputs
 type ImageInputSchema struct {
 }
@@ -108,10 +117,14 @@ func (is ImageInputSchema) Validate(name string, file multipart.File) (*Task, er
 	}
 	// Do something with csv?
 
-	task := Task{}
+	task := Task{DataJSON: name}
 	return &task, nil
 }
 
 func (is ImageInputSchema) SaveName(name string, id int) string {
 	return fmt.Sprintf("%s-%d", name, id)
+}
+
+func (is ImageInputSchema) FormatInputData(t *Task, data map[string]interface{}) {
+	data["ImgSrc"] = fmt.Sprintf("%s-%d", t.DataJSON, t.ID)
 }

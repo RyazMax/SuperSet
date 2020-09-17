@@ -7,15 +7,33 @@
 {{ if .TaskFound }}
 <!-- Input data formating -->
 {{ if eq .InputType "PlainText"}}
+Текст
 <p>{{ .Text }}</p>
 {{ end}}
 
 {{ if eq .InputType "TableData"}}
-<strong>Not supported yet</strong>
+<table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        {{ range $index, $colname := .ColNames }}
+        <th scope="col">{{ $colname }} </th>
+        {{ end }}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        th scope="row">1</th>
+        {{ range $index, $val := .ColVals }}
+        <td>{{ $val }} </td>
+        {{ end }}
+      </tr>
+    </tbody>
+  </table>
 {{ end }}
 
 {{ if eq .InputType "Image"}}
-<img src="{{.ImgSrc}}">
+<img width="400" height="400" src="/static/media/{{.ImgSrc}}" class="rounded mx-auto d-block">
 {{ end }}
 
 <!-- Output data formating -->
@@ -30,19 +48,26 @@
 
 {{ if eq .OutputType "ClassData"}}
 <div>
-    <!-- Something about classes-->
+    {{ range $index, $element := .Classes }}
+    <input type="radio" name="ClassLabel" value="{{ $element }}">
+    <label for="contactChoice1">{{ $element }}</label>
+    {{ end }}
 </div>
 {{ end }}
 
 {{ if eq .OutputType "PlainText"}}
-<input name="TextData">
+<input class="mx-auto d-block" name="TextData">
 {{ end }}
 
-<button type="submit">Отправить</button>
+<input type="hidden" name="projectID" value="{{.ProjectID}}">
+<input type="hidden" name="queuetaskID" value="{{ .TaskID }}">
+<input type="hidden" name="Projects" value="{{.Projects }}">
+<button type="submit" class="btn btn-lg btn-primary btn-block">Отправить</button>
 </form>
 {{ else }}
 
 <h1>Извините у этого проекта не осталось не размеченных данных </h1> 
-
+<a class="btn btn-lg btn-primary btn-block" href="/start_label">Выбрать проекты</a>
+<a class="btn btn-lg btn-primary btn-block" href="/label?Projects={{.Projects}}">Обновить</a>
 {{ end }}
 {{end}}

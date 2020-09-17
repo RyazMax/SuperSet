@@ -70,7 +70,7 @@ func TestManager(t *testing.T) {
 			t.Errorf("TakeTask failed, expected not nil Schema")
 		}
 
-		err = manager.LabelTask(tws, &testLabel)
+		err = manager.LabelTask(tws.Tsk, &testLabel)
 		if err != nil {
 			t.Errorf("LabelTask failed with %v", err)
 		}

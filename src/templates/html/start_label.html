@@ -1,0 +1,12 @@
+{{template "base" .}}
+
+{{define "title"}}SuperSet{{end}}
+
+{{define "main"}}
+Выберите проект для разметки
+<form action="/start_label" method="POST">
+<input name="projectName">
+<button class="btn btn-lg btn-primary btn-block" type="submit">Начать</button>
+</form>
+
+{{end}}

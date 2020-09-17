@@ -12,5 +12,5 @@ type TaskManager interface {
 
 	PutTask(string, *models.Task) (int, error)
 	TakeTask([]string) (*models.TaskWithSchema, error)
-	LabelTask(*models.TaskWithSchema, *models.LabeledTask) error
+	LabelTask(*models.TaskAggr, *models.LabeledTask) error
 }

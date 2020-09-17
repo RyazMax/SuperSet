@@ -4,7 +4,7 @@ start_tarantool:
 
 clean:
 	rm src/tarantool/data/* -rf
-	rm data/media/* -rf
+	rm src/static/media/* -rf
 
 test:
 	go test ./...

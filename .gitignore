@@ -21,4 +21,4 @@ src/tarantool/data
 
 # other
 .vscode
-data
+src/static/media/*

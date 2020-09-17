@@ -19,7 +19,7 @@ type TaskAggr struct {
 
 // TaskWithSchema also has schema
 type TaskWithSchema struct {
-	TaskAggr
+	Tsk    *TaskAggr
 	Schema *ProjectSchema
 }
 
