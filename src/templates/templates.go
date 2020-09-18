@@ -233,6 +233,13 @@ func LabelHandler(w http.ResponseWriter, r *http.Request) {
 		task.Schema.InputSchema.FormatInputData(&task.Tsk.Tsk, data)
 		task.Schema.OutputSchema.FormatOutputData(&task.Tsk.Tsk, data)
 	}
+
+	// For tpr
+	/*data["InputType"] = "TableData"
+	data["OutputType"] = "PlainText"
+	data["TaskFound"] = true
+	data["ColNames"] = []string{"Длина чашелистника", "Ширина чашелистника", "Длина лепестка"}
+	data["ColVals"] = []string{"5.1", "3.5", "1.4"}*/
 	err = LabelPageTemplate.Execute(w, data)
 	if err != nil {
 		log.Println(err)

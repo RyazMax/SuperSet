@@ -46,6 +46,17 @@ func (sm *SimpleManager) Init(ur user.Repo, pr project.Repo, gr grant.Repo, sr s
 	sm.schemaRepo = sr
 	sm.grantRepo = gr
 	sm.taskRepo = tr
+
+	user, _ := sm.userRepo.GetByLogin("admin")
+	_, err := sm.Create(&ProjectAggr{
+		Project: models.Project{OwnerID: int(user.ID), Name: "Animals"},
+		Schema: models.ProjectSchema{
+			InputSchema:  models.ImageInputSchema{},
+			OutputSchema: models.ClassOutputSchema{ClassNames: []string{"Кошка", "Cобака", "Корова"}},
+		}})
+	if err != nil {
+		log.Println(err)
+	}
 	return nil
 }
 

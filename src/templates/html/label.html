@@ -12,7 +12,7 @@
 {{ end}}
 
 {{ if eq .InputType "TableData"}}
-<table class="table">
+<table class="table form-signin">
     <thead>
       <tr>
         <th scope="col">#</th>
@@ -23,7 +23,7 @@
     </thead>
     <tbody>
       <tr>
-        th scope="row">1</th>
+        <th scope="row">1</th>
         {{ range $index, $val := .ColVals }}
         <td>{{ $val }} </td>
         {{ end }}
@@ -37,7 +37,7 @@
 {{ end }}
 
 <!-- Output data formating -->
-<form method="POST" action="/label">
+<form class="mx-auto d-block form-signin" method="POST" action="/label">
 {{ if eq .OutputType "Integer"}}
 <input name="IntegerData">
 {{ end }}
@@ -47,16 +47,16 @@
 {{ end }}
 
 {{ if eq .OutputType "ClassData"}}
-<div>
+<div class="mx-auto d-block">
     {{ range $index, $element := .Classes }}
-    <input type="radio" name="ClassLabel" value="{{ $element }}">
-    <label for="contactChoice1">{{ $element }}</label>
+    <input class="mx-auto d-block" type="radio" name="ClassLabel" value="{{ $element }}">
+    <label class="mx-auto d-block" for="contactChoice1">{{ $element }}</label>
     {{ end }}
 </div>
 {{ end }}
 
 {{ if eq .OutputType "PlainText"}}
-<input class="mx-auto d-block" name="TextData">
+<input class="mx-auto d-block" placeholder="Введите метку" name="TextData">
 {{ end }}
 
 <input type="hidden" name="projectID" value="{{.ProjectID}}">
