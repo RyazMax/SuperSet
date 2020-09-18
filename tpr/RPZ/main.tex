@@ -1,0 +1,46 @@
+\documentclass[12pt,a4paper]{article}
+\include{preamble}
+\def\wauthor{М.С. Рязанов}
+\def\wfirstlead{А.П. Ковтушенко}
+\def\wthemea{Cервис разметки данных}
+\def\wgroup{ИУ7-62Б}
+\def\wleadprefix{Руководитель курсового проекта}
+\def\wtype{
+    РАСЧЕТНО-ПОЯСНИТЕЛЬНАЯ ЗАПИСКА
+
+    \bigskip
+
+    К КУРСОВОМУ ПРОЕКТУ ПО БАЗАМ ДАННЫХ
+
+    \bigskip
+
+
+    ПО ТЕМЕ
+
+    \bigskip
+}
+\addbibresource{main.bib}
+
+\begin{document}
+
+\include{title}
+
+\tableofcontents
+\addcontentsline{toc}{section}{Содержание}
+
+\include{intro}
+
+\include{analytical}
+
+\include{design}
+
+\include{technological}
+
+\include{research}
+
+\include{conclusion}
+
+\printbibliography%
+\addcontentsline{toc}{section}{Литература}
+
+\end{document}

@@ -1,0 +1,61 @@
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+%\usepackage[14pt]{extsizes}
+\usepackage{adjustbox}
+\usepackage{graphicx}
+\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools} 
+\usepackage{ulem}
+\usepackage[backend=biber]{biblatex}
+\usepackage[top=2cm,bottom=2cm,left=3cm,right=2cm,nohead,nofoot]{geometry}
+\usepackage[onehalfspacing]{setspace}
+\usepackage{ifthenx}
+\usepackage{ifthen}
+\usepackage{csvsimple}
+\usepackage{booktabs}
+\usepackage{pgfplots}
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning,shadows,datavisualization}
+\usepackage[
+bookmarks=true, colorlinks=true, unicode=true,
+urlcolor=black,linkcolor=black, anchorcolor=black,
+citecolor=black, menucolor=black, filecolor=black,
+]{hyperref}
+\usepackage{microtype}
+\usepackage{enumerate}
+\usepackage{multirow}
+\usepackage{paralist,array}
+\usepackage{blindtext}
+\usepackage{newfloat}
+\usepackage{verbatim}
+\usepackage{caption}
+
+%\begin{comment}
+\usepackage{listings}
+\lstset{%
+    language=go,           
+    basicstyle=\small,
+    numbers=left,
+    numberstyle=\tiny,      
+    stepnumber=1,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false, 
+    showtabs=false,         
+    frame=single,           
+    tabsize=4,
+    captionpos=t,
+    breaklines=true,        
+    breakatwhitespace=false,
+}
+%\end{comment}
+\begin{comment}
+\usepackage{minted}
+\usepackage{csquotes}
+\newminted{cpp}{frame=single,linenos}
+\newenvironment{lstlisting}{\VerbatimEnvironment\begin{cppcode}}{\end{cppcode}
+}
+\end{comment}
+\setlength{\parskip}{0ex} 
+\pgfplotsset{compat=1.16}
+\captionsetup[figure]{name=Рисунок}
+
