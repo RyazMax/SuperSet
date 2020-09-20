@@ -23,4 +23,5 @@ type ProjectManager interface {
 
 	AddGrant(string, string, string) (bool, error)
 	DeleteGrant(string, string, string) (bool, error)
+	CheckGrant(string, string) (bool, error)
 }

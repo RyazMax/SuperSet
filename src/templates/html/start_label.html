@@ -4,6 +4,9 @@
 
 {{define "main"}}
 Выберите проект для разметки
+{{ if .Error }}
+<p>{{ .Error }} </p>
+{{ end }}
 <form action="/start_label" method="POST">
 <input name="projectName">
 <button class="btn btn-lg btn-primary btn-block" type="submit">Начать</button>

@@ -1,0 +1,41 @@
+{{ template "base" . }}
+
+{{ define "title" }} {{ .Project.Name }} {{ end }}
+
+{{ define "main"}}
+
+<h3>{{ .Project.Name }}</h3>
+<div class="container">
+    <div class="row">
+        <div class="col-5">
+            <!-- InputSchema desc -->
+            <p> Some input schema </p>
+        </div>
+
+        <div class="col-5">
+            <!-- OutputSchema desc-->
+            <p> Some output schema </p>
+        </div>
+    </div>
+    <h4>Добавление/удаление прав на проект</h4>
+    <div class="row">
+        {{ if .AddError }}
+        <div class="row"></div>
+        <p>{{ .AddError }} </p>
+        </div>
+        {{ end }}
+        {{ if .DeleteError }}
+        <p>{{ .DeleteError }}</p>
+        {{ end }}
+        <div class="row">
+        <form action="/grant" method="POST">
+            <input name="username" placeholder="Имя пользователя" required>
+            <input name="name" type="hidden" value="{{.Project.Name}}">
+            <button name="add" value="true" type="submit">+</button>
+            <button name="delete" value="true" type="submit">-</button>
+        </form>
+        </div>
+    </div>
+</div>
+
+{{ end }}

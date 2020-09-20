@@ -219,6 +219,37 @@ func (sm *SimpleManager) DeleteGrant(oname, pname, uname string) (bool, error) {
 	return true, nil
 }
 
+// CheckGrant check grant of user uname for project pname
+func (sm *SimpleManager) CheckGrant(pname, uname string) (bool, error) {
+	project, err := sm.projectRepo.GetByName(pname)
+	if err != nil {
+		log.Println("Can't delete", err)
+		return false, err
+	}
+	if project == nil {
+		return false, errors.New("Проект с таким именем не существует")
+	}
+
+	user, err := sm.userRepo.GetByLogin(uname)
+	if err != nil {
+		log.Println("Can't add", err)
+		return false, err
+	}
+	if user == nil {
+		return false, errors.New("Пользователь не существует")
+	}
+
+	existing, err := sm.grantRepo.GetByPairID(project.ID, int(user.ID))
+	if err != nil {
+		log.Println("Can't add", err)
+		return false, err
+	}
+	if existing == nil {
+		return false, errors.New("У пользователя нет прав на этот проект")
+	}
+	return true, nil
+}
+
 // Instance return instance of project aggr
 func Instance() *ProjectAggr {
 	return &ProjectAggr{}

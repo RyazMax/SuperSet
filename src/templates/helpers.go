@@ -101,6 +101,18 @@ func passUserName(next http.Handler) http.Handler {
 	})
 }
 
+func recoverMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Println("Recovered: ", r, err)
+				http.Error(w, "Server error", http.StatusInternalServerError)
+			}
+		}()
+		next.ServeHTTP(w, r)
+	})
+}
+
 type OutputElem struct {
 	ID   int
 	Data string

@@ -1,8 +1,26 @@
 {{template "base" .}}
 
-{{define "title"}}Profile{{end}}
+{{define "title"}}{{.UserName}}{{end}}
 
 {{define "main"}}
-<h2>Latest Snippets</h2>
-<p>There's nothing to see here yet!</p>
+
+<h3>Проекты</h3>
+<div class="container">
+    <div class="row">
+    <div class="col-2">
+        <p><strong>Пользователь:</strong>{{ .UserName }}</p>
+    </div>
+    <div class="col-6">
+        {{ range $i, $proj := .Projects }}
+        <div class="row">
+            <div class="col-4">
+            <a href="/project?name={{ $proj.Name }}">{{ $proj.Name }}</a>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+    <div class="col-4"></div>
+    </div>
+</div>
+
 {{end}}

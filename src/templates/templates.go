@@ -35,6 +35,7 @@ var (
 	UploadPageTemplate     *template.Template
 	StartLabelPageTemplate *template.Template
 	DownloadPageTemplate   *template.Template
+	ProjectPageTemplate    *template.Template
 )
 
 // Loading templates
@@ -92,6 +93,11 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	ProjectPageTemplate, err = template.ParseFiles(append([]string{path.Join(HTMLRootDir, "project.html")}, baseTemplates...)...)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 // IndexPageHandler handles "/"" requests
@@ -104,7 +110,33 @@ func IndexPageHandler(w http.ResponseWriter, r *http.Request) {
 
 // ProfilePageHandler handles "/profile" requests
 func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
-	err := ProfilePageTemplate.Execute(w, createDataOnContext(r.Context()))
+	data := createDataOnContext(r.Context())
+	uname, _ := data["UserName"].(string)
+	user, _ := universe.Get().UserRepo.GetByLogin(uname)
+	if user == nil {
+		log.Printf("Not found user with name %s", user.Login)
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	if user.Type == models.AdminUser {
+		projects, err := universe.Get().ProjectRepo.GetByOwnerID(int(user.ID))
+		if err != nil {
+			log.Println("[ProfilePageHandler]", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		data["Projects"] = projects
+	} else if user.Type == models.RegularUser {
+		http.Error(w, "Not implemented yet", http.StatusNotImplemented)
+		return
+	} else {
+		log.Printf("User %s has invalid type %d", user.Login, user.Type)
+		http.Error(w, "Incorrect user type", http.StatusBadRequest)
+		return
+	}
+
+	err := ProfilePageTemplate.Execute(w, data)
 	if err != nil {
 		log.Println(err)
 	}
@@ -251,18 +283,12 @@ func StartLabelHandler(w http.ResponseWriter, r *http.Request) {
 	data := createDataOnContext(r.Context())
 	if r.Method == "POST" {
 		projName := r.FormValue("projectName")
-		proj, err := universe.Get().ProjectRepo.GetByName(projName)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+		ok, err := universe.Get().ProjectManager.CheckGrant(projName, data["UserName"].(string))
+		if ok {
+			http.Redirect(w, r, "/label?Projects="+strings.Join([]string{projName}, ";"), 303) // Redirect
+		} else {
+			data["Error"] = err.Error()
 		}
-		if proj == nil {
-			log.Printf("Project %s not found", projName)
-			// Handle nil
-			return
-		}
-		log.Printf("Start ok %s", projName)
-		http.Redirect(w, r, "/label?Projects="+strings.Join([]string{projName}, ";"), 303) // Redirect
 	}
 	err := StartLabelPageTemplate.Execute(w, data)
 	if err != nil {
@@ -461,6 +487,77 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ProjectPageHandler handles requests for project page
+func ProjectPageHandler(w http.ResponseWriter, r *http.Request) {
+	data := createDataOnContext(r.Context())
+
+	addError := r.FormValue("adderror")
+	if addError != "" {
+		data["AddError"] = addError
+	}
+	deleteError := r.FormValue("deleteerror")
+	if deleteError != "" {
+		data["DeleteError"] = deleteError
+	}
+
+	projectName := r.FormValue("name")
+	project, err := universe.Get().ProjectRepo.GetByName(projectName)
+	if err != nil {
+		log.Printf("[ProjectPageHandler] Error on getting project %s, %v", projectName, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	data["Project"] = project
+	// Add .formatInfo for schemas
+	schema, err := universe.Get().SchemaRepo.GetByProjectID(project.ID)
+	if err != nil {
+		log.Printf("[ProjectPageHandler] Error on getting schema %d, %v", project.ID, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	data["Schema"] = schema
+
+	err = ProjectPageTemplate.Execute(w, data)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+// GrantHandler do requests on "/grant"
+func GrantHandler(w http.ResponseWriter, r *http.Request) {
+	data := createDataOnContext(r.Context())
+	isDel := r.FormValue("delete") != ""
+	var addError, deleteError string
+	if !isDel {
+		ok, err := universe.Get().ProjectManager.AddGrant(data["UserName"].(string),
+			r.FormValue("name"),
+			r.FormValue("username"))
+		if !ok {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		} else if err != nil {
+			addError = err.Error()
+		}
+	} else if isDel {
+		ok, err := universe.Get().ProjectManager.DeleteGrant(data["UserName"].(string),
+			r.FormValue("name"),
+			r.FormValue("username"))
+		if !ok {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		} else if err != nil {
+			deleteError = err.Error()
+		}
+	} else {
+		http.Error(w, "Bad method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	projName := r.FormValue("name")
+	http.Redirect(w, r, fmt.Sprintf("/project?name=%s&adderror=%s&deleteerror=%s", projName, addError, deleteError), 303)
+	return
+}
+
 // Handler returns http.Handler that serves web-site routes
 func Handler() http.Handler {
 	mux := http.NewServeMux()
@@ -470,12 +567,15 @@ func Handler() http.Handler {
 
 	mux.Handle("/new_project", loginRequired(http.HandlerFunc(NewProjectHandler)))
 	mux.Handle("/profile", loginRequired(http.HandlerFunc(ProfilePageHandler)))
+	mux.Handle("/project", loginRequired(http.HandlerFunc(ProjectPageHandler)))
 	mux.Handle("/start_label", loginRequired(http.HandlerFunc(StartLabelHandler)))
 	mux.Handle("/label", loginRequired(http.HandlerFunc(LabelHandler)))
 	mux.Handle("/logout", loginRequired(http.HandlerFunc(LogoutHandler)))
 	mux.Handle("/upload", loginRequired(http.HandlerFunc(UploadHandler)))
 	mux.Handle("/download", loginRequired(http.HandlerFunc(DownloadHandler)))
+	mux.Handle("/grant", loginRequired(http.HandlerFunc(GrantHandler)))
 	mux.Handle("/", passUserName(http.HandlerFunc(IndexPageHandler)))
 
+	//return recoverMiddleware(mux)
 	return mux
 }
