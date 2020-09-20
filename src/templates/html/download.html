@@ -3,6 +3,9 @@
 {{define "title"}}SuperSet{{end}}
 
 {{define "main"}}
+{{ if .Error }}
+<p>{{ .Error }} </p>
+{{ end }}
 <form action="/download" method="POST">
     <label for="projectName">Название проекта</label>
     <input id="projectName" name="projectName" required>
@@ -12,8 +15,6 @@
         <input type="radio" id="typeChoice2" name="type" value="csv" required>
         <label for="typeChoice2">CSV</label>
     </div>
-    <label for="timestamp">Timestamp</label>
-    <input id="timestamp" name="timestamp">
     <label for="originid">ID оригинала</label>
     <input id="originid" name="originid">
     <input type="submit" class="btn btn-lg btn-primary btn-block" />

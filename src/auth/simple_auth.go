@@ -23,7 +23,7 @@ func (auth *SimpleAuth) Init(ur user.Repo, sr session.Repo) error {
 	auth.sessionRepo = sr
 
 	// For testing
-	auth.NewUser(&models.User{Login: "admin", PasswordShadow: "admin"})
+	auth.NewUser(&models.User{Login: "User", PasswordShadow: "user"})
 	return nil
 }
 

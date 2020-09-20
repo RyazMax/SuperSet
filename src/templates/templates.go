@@ -330,7 +330,7 @@ func NewProjectHandler(w http.ResponseWriter, r *http.Request) {
 		} else if err != nil {
 			data["InputError"] = err.Error()
 		}
-		http.Redirect(w, r, "/project", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, fmt.Sprintf("/project?name=%s", prName), http.StatusTemporaryRedirect)
 		return
 	}
 	err := NewProjectPageTemplate.Execute(w, createDataOnContext(r.Context()))
@@ -348,6 +348,15 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		m := r.MultipartForm
 		projName := r.FormValue("projectName")
 
+		ok, err := universe.Get().ProjectManager.IsOwner(data["UserName"].(string), projName)
+		if !ok {
+			data["Error"] = err.Error()
+			err := UploadPageTemplate.Execute(w, data)
+			if err != nil {
+				log.Println(err)
+			}
+			return
+		}
 		proj, err := universe.Get().ProjectRepo.GetByName(projName)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -424,18 +433,18 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		projectName := r.FormValue("projectName")
 		outputType := r.FormValue("type")
-		ts := r.FormValue("timestamp")
 		originID := r.FormValue("originID")
 
-		project, err := universe.Get().ProjectRepo.GetByName(projectName)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		ok, err := universe.Get().ProjectManager.IsOwner(data["UserName"].(string), projectName)
+		if !ok {
+			data["Error"] = err.Error()
+			err := DownloadPageTemplate.Execute(w, data)
+			if err != nil {
+				log.Println(err)
+			}
 			return
 		}
-		if project == nil {
-			http.Error(w, "Project not found", http.StatusNotFound)
-			return
-		}
+		project, _ := universe.Get().ProjectRepo.GetByName(projectName)
 
 		var ltsks []models.LabeledTask
 		if originID != "" {
@@ -451,17 +460,6 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			if tsk != nil {
 				ltsks = []models.LabeledTask{*tsk}
-			}
-		} else if ts != "" {
-			tstamp, err := strconv.Atoi(ts)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
-				return
-			}
-			ltsks, err = universe.Get().LabeledRepo.GetGreaterTime(project.ID, uint64(tstamp))
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
-				return
 			}
 		} else {
 			ltsks, err = universe.Get().LabeledRepo.GetByProjectID(project.ID)

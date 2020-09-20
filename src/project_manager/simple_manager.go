@@ -47,16 +47,6 @@ func (sm *SimpleManager) Init(ur user.Repo, pr project.Repo, gr grant.Repo, sr s
 	sm.grantRepo = gr
 	sm.taskRepo = tr
 
-	user, _ := sm.userRepo.GetByLogin("admin")
-	_, err := sm.Create(&ProjectAggr{
-		Project: models.Project{OwnerID: int(user.ID), Name: "Animals"},
-		Schema: models.ProjectSchema{
-			InputSchema:  models.ImageInputSchema{},
-			OutputSchema: models.ClassOutputSchema{ClassNames: []string{"Кошка", "Cобака", "Корова"}},
-		}})
-	if err != nil {
-		log.Println(err)
-	}
 	return nil
 }
 
@@ -246,6 +236,31 @@ func (sm *SimpleManager) CheckGrant(pname, uname string) (bool, error) {
 	}
 	if existing == nil {
 		return false, errors.New("У пользователя нет прав на этот проект")
+	}
+	return true, nil
+}
+
+func (sm *SimpleManager) IsOwner(oname string, pname string) (bool, error) {
+	user, err := sm.userRepo.GetByLogin(oname)
+	if err != nil {
+		log.Println("Can't delete", err)
+		return false, err
+	}
+	if user == nil {
+		log.Println("Owner of ", oname, " do not exists")
+		return false, errors.New("Пользователь не существует")
+	}
+
+	project, err := sm.projectRepo.GetByName(pname)
+	if err != nil {
+		log.Println("Can't delete", err)
+		return false, err
+	}
+	if project == nil {
+		return false, errors.New("Проект не существует")
+	}
+	if int(user.ID) != project.OwnerID {
+		return false, errors.New("Пользователь не является владельцем проекта")
 	}
 	return true, nil
 }
