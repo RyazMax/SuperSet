@@ -10,6 +10,7 @@ type Repo interface {
 	GetByID(int) (*models.Project, error)
 	GetByName(string) (*models.Project, error)
 	GetByOwnerID(int) ([]models.Project, error)
+	GetAllowed(int) ([]models.Project, error)
 
 	Insert(*models.Project) error
 

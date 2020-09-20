@@ -24,10 +24,6 @@ local function init()
     if err then
         error(err)
     end
-    ok, err = ddl.set_schema(project.schema)
-    if err then
-        error(err)
-    end
     ok, err = ddl.set_schema(session.schema)
     if err then
         error(err)
@@ -39,6 +35,7 @@ local function init()
     grant.init()
     labeledtask.init()
     tasks.init()
+    project.init()
 end
 
 init()

@@ -9,38 +9,24 @@
     <p>{{ .InputError }}</p>
     {{end}}
     <label for="projectName" class="sr-only">Название проекта</label>
-    <input id="projectName" class="form-control" placeholder="Название проекта" name="projectName" required autofocus>
-    <div>
-      <input type="radio" id="ischemaChoice1"
-       name="ischema" value="PlainText">
-      <label for="ischemaChoice1">Текст</label>
-  
-      <input type="radio" id="ischemaChoice2"
-       name="ischema" value="Image">
-      <label for="ischemaChoice2">Картинка</label>
-
-      <input type="radio" id="ischemaChoice3"
-       name="ischema" value="TableData">
-      <label for="ischemaChoice3">Табличные данные</label>
-
-    </div>
-    <div>
-      <input type="radio" id="oschemaChoice1"
-       name="oschema" value="PlainText">
-      <label for="oschemaChoice1">Текст</label>
-  
-      <input type="radio" id="oschemaChoice2"
-       name="oschema" value="ClassData">
-      <label for="oschemaChoice2">Классы</label>
-
-      <input type="radio" id="oschemaChoice3"
-      name="oschema" value="Integer">
-      <label for="oschemaChoice3">Целое</label>
-
-      <input type="radio" id="oschemaChoice4"
-      name="oschema" value="Integer">
-      <label for="oschemaChoice4">Вещественное</label>
-    </div>
+    <input id="projectName" class="form-control mb-3" placeholder="Название проекта" name="projectName" required autofocus>
+    <p>
+      Тип входных данных
+    </p>
+    <select name="ischema" class="form-control mb-3 form-control-lg">
+      <option value="PlainText">Текст</option>
+      <option value="Image">Изображение</option>
+      <option value="TableData">Табличные данные</option>
+    </select>
+    <p>
+    Тип выходных данных
+    </p>
+    <select name="oschema" class="form-control mb-3 form-control-lg">
+      <option value="PlainText">Текст</option>
+      <option value="ClassData">Классы</option>
+      <option value="Integer">Целое</option>
+      <option value="Float">Вещественное</option>
+    </select>
 <!--
     <div>
       <input type="classname" placeholder="Класс 1">

@@ -4,7 +4,9 @@
 
 {{ define "main"}}
 
-<h3>{{ .Project.Name }}</h3>
+<div class="form-signin">
+<h1 class="h3 mb-3 mx-auto font-weight-normal">{{ .Project.Name }}</h1>
+</div>
 <div class="container">
     <div class="row">
         <div class="col-5">
@@ -17,22 +19,22 @@
             <p> Some output schema </p>
         </div>
     </div>
-    <h4>Добавление/удаление прав на проект</h4>
     <div class="row">
-        {{ if .AddError }}
-        <div class="row"></div>
-        <p>{{ .AddError }} </p>
-        </div>
-        {{ end }}
-        {{ if .DeleteError }}
-        <p>{{ .DeleteError }}</p>
-        {{ end }}
         <div class="row">
-        <form action="/grant" method="POST">
-            <input name="username" placeholder="Имя пользователя" required>
-            <input name="name" type="hidden" value="{{.Project.Name}}">
-            <button name="add" value="true" type="submit">+</button>
-            <button name="delete" value="true" type="submit">-</button>
+        <form action="/grant" class="form-signin" method="POST">
+            <h1 class="h3 mb-3 mx-auto font-weight-normal">Добавление/удаление прав на проект</h1>
+            {{ if .AddError }}
+            <div class="row"></div>
+            <p>{{ .AddError }} </p>
+            </div>
+            {{ end }}
+            {{ if .DeleteError }}
+            <p>{{ .DeleteError }}</p>
+            {{ end }}
+            <input name="username" class="form-control" placeholder="Имя пользователя" required>
+            <input name="name" class="form-control" type="hidden" value="{{.Project.Name}}">
+            <button name="add" class="btn mx-auto" value="true" type="submit">+</button>
+            <button name="delete" class="btn mx-auto" value="true" type="submit">-</button>
         </form>
         </div>
     </div>

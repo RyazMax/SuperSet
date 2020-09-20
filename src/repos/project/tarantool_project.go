@@ -66,6 +66,16 @@ func (tp *TarantoolRepo) GetByOwnerID(id int) ([]models.Project, error) {
 	return p, err
 }
 
+// GetAllowed gets projects which are allowed to user with ID = id
+func (tp *TarantoolRepo) GetAllowed(id int) ([]models.Project, error) {
+	var p []models.Project
+	err := tp.conn.CallTyped("get_allowed_projects", []interface{}{id}, &p)
+	if err != nil {
+		log.Println(err)
+	}
+	return p, err
+}
+
 // Insert inserts project
 func (tp *TarantoolRepo) Insert(p *models.Project) error {
 	var resp interface{}

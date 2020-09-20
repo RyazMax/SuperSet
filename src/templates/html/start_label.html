@@ -3,13 +3,20 @@
 {{define "title"}}SuperSet{{end}}
 
 {{define "main"}}
-Выберите проект для разметки
+<form class="form-signin" action="/start_label" method="POST">
+<h1 class="h3 mb-3 mx-auto font-weight-normal">Выберите проект для разметки</h1>
 {{ if .Error }}
-<p>{{ .Error }} </p>
+<p> {{ .Error }} </p>
 {{ end }}
-<form action="/start_label" method="POST">
-<input name="projectName">
-<button class="btn btn-lg btn-primary btn-block" type="submit">Начать</button>
+{{ if not .Projects }}
+<p> У вас не прав на разметку проектов. обратитесь к администратору </p>
+{{ else }}
+<select onfocus='this.size=2;' onblur='this.size=1;' onchange='this.size=1; this.blur();' name="projectName" class="form-control mb-3">
+    {{ range $i, $proj := .Projects }}
+    <option value="{{ $proj.Name }}"> {{ $proj.Name }} </option>
+    {{ end }}
+</select>
+<button class="btn btn-primary btn-block" type="submit">Начать разметку</button>
+{{ end }}
 </form>
-
 {{end}}

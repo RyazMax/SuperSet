@@ -3,20 +3,26 @@
 {{define "title"}}SuperSet{{end}}
 
 {{define "main"}}
-{{ if .Error }}
-<p>{{ .Error }} </p>
-{{ end }}
-<form action="/download" method="POST">
-    <label for="projectName">Название проекта</label>
-    <input id="projectName" name="projectName" required>
-    <div>
-        <input type="radio" id="typeChoice1" name="type" value="json">
-        <label for="typeChoice1">JSON</label>
-        <input type="radio" id="typeChoice2" name="type" value="csv" required>
-        <label for="typeChoice2">CSV</label>
+<form class="form-signin" action="/download" method="POST">
+    <h1 class="h3 mb-3 mx-auto font-weight-normal">Выгрузка данных</h1>
+    {{ if .Error }}
+    <p>{{ .Error }} </p>
+    {{ end }}
+    <p>Название проекта</p>
+    <select onfocus='this.size=2;' onblur='this.size=1;' onchange='this.size=1; this.blur();' name="projectName" class="form-control mb-3">
+        {{ range $i, $proj := .Projects }}
+        <option value="{{ $proj.Name }}"> {{ $proj.Name }} </option>
+        {{ end }}
+    </select>
+    <div class="btn-group btn-group-toggle mb-3 mx-auto" data-toggle="buttons">
+        <label>
+            <input type="radio" id="typeChoice1" name="type" value="json" > JSON
+        </label>
+        <label for="typeChoice2">
+            <input type="radio" id="typeChoice2" name="type" value="csv" required>CSV
+        </label>
     </div>
-    <label for="originid">ID оригинала</label>
-    <input id="originid" name="originid">
-    <input type="submit" class="btn btn-lg btn-primary btn-block" />
+    <input id="originid" class="form-control mb-3" placeholder="ID оригинала(опционально)" name="originid">
+    <button type="submit" class="btn btn-lg btn-primary btn-block">Выгрузить</button>
 </form>
 {{end}}

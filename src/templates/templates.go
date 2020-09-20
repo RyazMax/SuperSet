@@ -290,7 +290,20 @@ func StartLabelHandler(w http.ResponseWriter, r *http.Request) {
 			data["Error"] = err.Error()
 		}
 	}
-	err := StartLabelPageTemplate.Execute(w, data)
+	user, err := universe.Get().UserRepo.GetByLogin(data["UserName"].(string))
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	projects, err := universe.Get().ProjectRepo.GetAllowed(int(user.ID))
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	data["Projects"] = projects
+	err = StartLabelPageTemplate.Execute(w, data)
 	if err != nil {
 		log.Println(err)
 	}
@@ -421,7 +434,20 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		encoder.Encode(mapping)
 		return
 	} else {
-		err := UploadPageTemplate.Execute(w, data)
+		user, err := universe.Get().UserRepo.GetByLogin(data["UserName"].(string))
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		projects, err := universe.Get().ProjectRepo.GetByOwnerID(int(user.ID))
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		data["Projects"] = projects
+		err = UploadPageTemplate.Execute(w, data)
 		if err != nil {
 			log.Println(err)
 		}
@@ -479,7 +505,21 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	err := DownloadPageTemplate.Execute(w, data)
+
+	user, err := universe.Get().UserRepo.GetByLogin(data["UserName"].(string))
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	projects, err := universe.Get().ProjectRepo.GetByOwnerID(int(user.ID))
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	data["Projects"] = projects
+	err = DownloadPageTemplate.Execute(w, data)
 	if err != nil {
 		log.Println(err)
 	}

@@ -4,23 +4,16 @@
 
 {{define "main"}}
 
-<h3>Проекты</h3>
-<div class="container">
-    <div class="row">
-    <div class="col-2">
-        <p><strong>Пользователь:</strong>{{ .UserName }}</p>
-    </div>
-    <div class="col-6">
+<div class="form-signin container mx-auto">
+    <h1 class="h3 mb-3 font-weight-normal">Ваши проекты</h1>
+    
+    <div class="list-group">
         {{ range $i, $proj := .Projects }}
-        <div class="row">
-            <div class="col-4">
-            <a href="/project?name={{ $proj.Name }}">{{ $proj.Name }}</a>
-            </div>
-        </div>
+        <a href="/project?name={{ $proj.Name }}" class="list-group-item list-group-item-info">
+            {{ $proj.Name }}
+        </a>
         {{ end }}
-    </div>
-    <div class="col-4"></div>
-    </div>
+    </div>    
 </div>
 
 {{end}}

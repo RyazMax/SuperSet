@@ -1,7 +1,7 @@
 local queue = require('queue')
 
 local tasks = {}
-local TTR = 60 * 15 -- 15 Minutes
+local TTR = 60 * 2 -- 15 Minutes
 local ITERATIONS_NUM = 10
 local PER_PROJECT_TIMEOUT = 0.1
 

@@ -1,3 +1,5 @@
+local ddl = require('ddl')
+
 local project = {}
 
 project.schema = {
@@ -36,5 +38,20 @@ project.schema = {
         },
     },
 }
+
+function get_allowed_projects(id)
+    local res = {}
+    for _, t in box.space.project_grants.index.UserID:pairs(id) do
+        table.insert(res, box.space.projects:get(t["ProjectID"]))
+    end
+    return res
+end
+
+function project.init()
+    local ok, err = ddl.set_schema(project.schema)
+    if err ~= nil then
+        error(err)
+    end
+end
 
 return project

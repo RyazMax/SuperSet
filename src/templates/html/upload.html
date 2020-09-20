@@ -3,12 +3,26 @@
 {{define "title"}}SuperSet{{end}}
 
 {{define "main"}}
-{{ if .Error }}
-<p>{{ .Error }} </p>
-{{ end }}
-<form action="/upload" method="POST" enctype="multipart/form-data" >
-    <input name="projectName">
-    <input type="file" name="dataFile" multiple/>
-    <input type="submit" value="upload" />
-</form>
+<div class="container">
+    <form class="form-signin" action="/upload" method="POST" enctype="multipart/form-data" >
+        <h1 class="h3 mb-3 mx-auto font-weight-normal">Загрузка данных</h1>
+        <div class="row">
+        {{ if .Error }}
+        <p>{{ .Error }} </p>
+        {{ end }}
+        <p>Название проекта</p>
+        <select onfocus='this.size=2;' onblur='this.size=1;' onchange='this.size=1; this.blur();' name="projectName" class="form-control mb-3">
+        {{ range $i, $proj := .Projects }}
+        <option value="{{ $proj.Name }}"> {{ $proj.Name }} </option>
+        {{ end }}
+        </select>
+        </div>
+        <div class="row">
+        <input type="file" class="btn btn-secondary form-control mb-3" name="dataFile" multiple required>
+        </div>
+        <div class="row">
+        <button class="btn btn-primary btn-block" type="submit" value="upload">Загрузить</button>
+        </div>
+    </form>
+    </div>
 {{end}}

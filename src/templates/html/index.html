@@ -3,6 +3,50 @@
 {{define "title"}}SuperSet{{end}}
 
 {{define "main"}}
-<h1>SuperSet - разметка данных</h1>
-<p>Используйте наш сервис, чтобы разметить ваши данные и использовать их для обучения модели!</p>
+
+<section class="jumbotron text-center">
+    <div class="container">
+      <h1 class="jumbotron-heading">SuperSet - разметка данных</h1>
+      <p class="lead text-muted">Используйте наш сервис, чтобы разметить ваши данные и использовать их для обучения модели!</p>
+        <a href="/new_project" class="btn btn-primary my-2">Создать проект</a>
+        <a href="/start_label" class="btn btn-secondary my-2">Начать разметку</a>
+      </p>
+    </div>
+</section>
+
+<div class="album py-5 bg-light">
+    <div class="container">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="card mb-4 box-shadow">
+                <img class="card-img-top" src="/static/img/class.png" alt="Card image cap">
+                <div class="card-body">
+                  <p class="card-text">Загружайте ваши изображения и проводите разметку по одной из доступных схем!</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card mb-4 box-shadow">
+                <img class="card-img-top" src="/static/img/table.png" alt="Card image cap">
+                <div class="card-body">
+                  <p class="card-text">Загружайте данные в CSV и размечайте данные, отображающиейся в красивой табличке на сайте.</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card mb-4 box-shadow">
+                <img class="card-img-top" data-src="schema.png" alt="Card image cap">
+                <div class="card-body">
+                  <p class="card-text">Настраивайте схему входных и выходных данных так, как это требует ваша задача!</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                  </div>
+                </div>
+              </div>
+            </div>
+    </div>
+</div>
 {{end}}
