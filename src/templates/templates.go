@@ -1,6 +1,7 @@
 package templates
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -324,6 +325,8 @@ func NewProjectHandler(w http.ResponseWriter, r *http.Request) {
 			data["InputError"] = "Неверный формат ввода/вывода"
 			return
 		}
+		ischema = ischema.Init(r)
+		oschema = oschema.Init(r)
 
 		uname, _ := data["UserName"].(string)
 		user, _ := universe.Get().UserRepo.GetByLogin(uname)
@@ -396,18 +399,36 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			task, err := schema.InputSchema.Validate(files[i].Filename, file)
-			if err != nil {
-				// handler validate error
-				log.Println(err)
-				return
-			}
-			task.ProjectID = proj.ID
+			var id int
+			if schema.InputSchema.InputType() == models.TableInputType {
+				reader := csv.NewReader(file)
+				strings, err := reader.ReadAll()
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				for _, str := range strings {
+					data, _ := json.Marshal(str)
+					task := models.Task{
+						DataJSON: string(data), // Not JSON but ok:)
+					}
+					task.ProjectID = proj.ID
+					universe.Get().TaskManager.PutTask(projName, &task)
+				}
+			} else {
+				task, err := schema.InputSchema.Validate(files[i].Filename, file)
+				if err != nil {
+					// handler validate error
+					log.Println(err)
+					return
+				}
+				task.ProjectID = proj.ID
 
-			id, err := universe.Get().TaskManager.PutTask(projName, task)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
+				id, err = universe.Get().TaskManager.PutTask(projName, task)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
 			}
 
 			// Do something with id

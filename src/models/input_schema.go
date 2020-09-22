@@ -1,11 +1,14 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"mime/multipart"
+	"net/http"
 	"path/filepath"
+	"strconv"
 )
 
 // IInputSchema is interface for input schemas
@@ -16,6 +19,7 @@ type IInputSchema interface {
 	SaveName(string, int) string
 
 	FormatInputData(*Task, map[string]interface{})
+	Init(r *http.Request) IInputSchema
 }
 
 const (
@@ -67,6 +71,10 @@ func (ts TextInputSchema) FormatInputData(t *Task, data map[string]interface{}) 
 	data["Text"] = t.DataJSON
 }
 
+func (ts TextInputSchema) Init(r *http.Request) IInputSchema {
+	return ts
+}
+
 // TableInputSchema table values input implementation
 type TableInputSchema struct {
 	ColumnsNumber int
@@ -81,7 +89,7 @@ func (ts TableInputSchema) InputType() string {
 func (ts TableInputSchema) Validate(name string, file multipart.File) (*Task, error) {
 	ext := filepath.Ext(name)
 	if ext != ".csv" {
-		return nil, errors.New("Текстовая схема требует .txt файлы")
+		return nil, errors.New("Текстовая схема требует .csv файлы")
 	}
 	text, _ := ioutil.ReadAll(file)
 
@@ -98,6 +106,18 @@ func (ts TableInputSchema) SaveName(name string, id int) string {
 }
 
 func (ts TableInputSchema) FormatInputData(t *Task, data map[string]interface{}) {
+	data["ColNames"] = ts.ColumnsNames
+	var s []string
+	json.Unmarshal([]byte(t.DataJSON), &s)
+	data["ColVals"] = s
+}
+
+func (ts TableInputSchema) Init(r *http.Request) IInputSchema {
+	ts.ColumnsNumber, _ = strconv.Atoi(r.FormValue("col_count"))
+	for i := 0; i < ts.ColumnsNumber; i++ {
+		ts.ColumnsNames = append(ts.ColumnsNames, r.FormValue("column_"+strconv.Itoa(i+1)))
+	}
+	return ts
 }
 
 // ImageInputSchema is for images inputs
@@ -127,4 +147,8 @@ func (is ImageInputSchema) SaveName(name string, id int) string {
 
 func (is ImageInputSchema) FormatInputData(t *Task, data map[string]interface{}) {
 	data["ImgSrc"] = fmt.Sprintf("%s-%d", t.DataJSON, t.ID)
+}
+
+func (is ImageInputSchema) Init(r *http.Request) IInputSchema {
+	return is
 }

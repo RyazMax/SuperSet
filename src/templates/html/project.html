@@ -5,27 +5,16 @@
 {{ define "main"}}
 
 <div class="form-signin">
-<h1 class="h3 mb-3 mx-auto font-weight-normal">{{ .Project.Name }}</h1>
 </div>
 <div class="container">
     <div class="row">
-        <div class="col-5">
-            <!-- InputSchema desc -->
-            <p> Some input schema </p>
-        </div>
-
-        <div class="col-5">
-            <!-- OutputSchema desc-->
-            <p> Some output schema </p>
-        </div>
-    </div>
-    <div class="row">
         <div class="row">
         <form action="/grant" class="form-signin" method="POST">
+            <h1 class="h3 mb-3 mx-auto font-weight-normal">{{ .Project.Name }}</h1>
             <h1 class="h3 mb-3 mx-auto font-weight-normal">Добавление/удаление прав на проект</h1>
             {{ if .AddError }}
             <div class="row"></div>
-            <p>{{ .AddError }} </p>
+            <p> {{ .AddError }} </p>
             </div>
             {{ end }}
             {{ if .DeleteError }}

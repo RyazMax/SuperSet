@@ -1,6 +1,9 @@
 package models
 
-import "net/http"
+import (
+	"net/http"
+	"strconv"
+)
 
 // IOutputSchema describes output schema of dataset
 type IOutputSchema interface {
@@ -8,6 +11,8 @@ type IOutputSchema interface {
 
 	FormatOutputData(*Task, map[string]interface{})
 	FormatLabeledTask(r *http.Request) (*LabeledTask, error)
+
+	Init(r *http.Request) IOutputSchema
 }
 
 const (
@@ -54,6 +59,10 @@ func (is IntOutputSchema) FormatLabeledTask(r *http.Request) (*LabeledTask, erro
 	return &t, nil
 }
 
+func (is IntOutputSchema) Init(r *http.Request) IOutputSchema {
+	return is
+}
+
 // FloatOutputSchema is struct for float regression tasks
 type FloatOutputSchema struct {
 	IsLimited   bool
@@ -74,6 +83,10 @@ func (fs FloatOutputSchema) FormatLabeledTask(r *http.Request) (*LabeledTask, er
 		AnswerJSON: r.FormValue("FloatData"),
 	}
 	return &t, nil
+}
+
+func (fs FloatOutputSchema) Init(r *http.Request) IOutputSchema {
+	return fs
 }
 
 // ClassOutputSchema for classification task
@@ -97,6 +110,15 @@ func (cs ClassOutputSchema) FormatLabeledTask(r *http.Request) (*LabeledTask, er
 	return &t, nil
 }
 
+func (cs ClassOutputSchema) Init(r *http.Request) IOutputSchema {
+	count, _ := strconv.Atoi(r.FormValue("class_count"))
+	cs.ClassNames = make([]string, count)
+	for i := 0; i < count; i++ {
+		cs.ClassNames[i] = r.FormValue("classname_" + strconv.Itoa(i+1))
+	}
+	return cs
+}
+
 // TextOutputSchema for text answers
 type TextOutputSchema struct {
 	MinLength int
@@ -116,4 +138,8 @@ func (ts TextOutputSchema) FormatLabeledTask(r *http.Request) (*LabeledTask, err
 		AnswerJSON: r.FormValue("TextData"),
 	}
 	return &t, nil
+}
+
+func (ts TextOutputSchema) Init(r *http.Request) IOutputSchema {
+	return ts
 }

@@ -1,6 +1,6 @@
 {{template "base" .}}
 
-{{define "title"}}Signup{{end}}
+{{define "title"}}Новый проект{{end}}
 
 {{define "main"}}
 <form class="form-signin" action="/new_project" method="POST">
@@ -13,28 +13,80 @@
     <p>
       Тип входных данных
     </p>
-    <select name="ischema" class="form-control mb-3 form-control-lg">
-      <option value="PlainText">Текст</option>
+    <select onchange="on_input_schema_changed(this)" name="ischema" class="form-control mb-3 form-control-lg">
+      <option value="PlainText" selected>Текст</option>
       <option value="Image">Изображение</option>
       <option value="TableData">Табличные данные</option>
     </select>
+    <div id="input_columns" hidden>
+      <input name="column_1" placeholder="Cтолбец 1">
+      <input name="column_2" placeholder="Столбец 2">
+      <input id="col_count" type="hidden" name="col_count" value=2>
+      <button type="button" onclick="add_col()">+</button>
+    </div>
     <p>
     Тип выходных данных
     </p>
-    <select name="oschema" class="form-control mb-3 form-control-lg">
-      <option value="PlainText">Текст</option>
+    <select onchange="on_output_schema_changed(this)" name="oschema" class="form-control mb-3 form-control-lg">
+      <option value="PlainText" selected>Текст</option>
       <option value="ClassData">Классы</option>
       <option value="Integer">Целое</option>
       <option value="Float">Вещественное</option>
     </select>
-<!--
-    <div>
-      <input type="classname" placeholder="Класс 1">
-      <input type="classname" placeholder="Класс 2">
-      <input type="classname" placeholder="Класс 3">
-      <button>+</button>
+    <div id="output_classes" hidden>
+      <input name="classname_1" placeholder="Класс 1">
+      <input name="classname_2" placeholder="Класс 2">
+      <input id="class_count" type="hidden" name="class_count" value=2>
+      <button type="button" class="btn btn-sm btn-secondary" onclick="add_class()">+</button>
     </div>
-  -->
     <button class="btn btn-lg btn-primary btn-block" type="submit">Cоздать</button>
   </form>
+
+<script>
+function add_col() {
+  let elem = document.getElementById("col_count")
+  let count = Number(elem.value) + 1
+
+  var inp = document.createElement("input")
+  inp.name = "column_" + count
+  inp.placeholder = "Столбец " + count
+  inp.required = true
+
+  document.getElementById("input_columns").appendChild(inp)
+  elem.value = count
+}
+
+function add_class() {
+  let elem = document.getElementById("class_count")
+  let count = Number(elem.value) + 1
+
+  var inp = document.createElement("input")
+  inp.name = "classname_" + count
+  inp.placeholder = "Класс " + count
+  inp.required = true
+
+  document.getElementById("output_classes").appendChild(inp)
+  elem.value = count
+}
+
+function on_input_schema_changed(sel) {
+  if (sel.value == "TableData") {
+    document.getElementById("input_columns").hidden = false
+  } else {
+    document.getElementById("input_columns").hidden = true
+  }
+  document.getElementById("col_count").value = 2
+}
+
+function on_output_schema_changed(sel) {
+  if (sel.value == "ClassData") {
+    document.getElementById("output_classes").hidden = false
+  } else {
+    document.getElementById("output_classes").hidden = true
+  }
+  document.getElementById("class_count").value = 2
+}
+</script> 
+  
+
 {{end}}
